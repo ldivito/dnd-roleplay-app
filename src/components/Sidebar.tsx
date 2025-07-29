@@ -20,6 +20,7 @@ import {
   Zap,
   Package,
   Scroll,
+  Target,
 } from 'lucide-react'
 
 interface NavItem {
@@ -77,6 +78,12 @@ const navigationItems: NavItem[] = [
     href: '/lore',
     icon: Scroll,
     description: 'Historia, leyendas y conocimiento del mundo',
+  },
+  {
+    title: 'Misiones',
+    href: '/quests',
+    icon: Target,
+    description: 'Sistema de misiones y objetivos',
   },
   {
     title: 'Notas de Campaña',
