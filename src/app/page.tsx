@@ -8,9 +8,7 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-white mb-2">
             D&D Roleplay Session
           </h1>
-          <p className="text-gray-300 text-lg">
-            Dungeon Master Interface
-          </p>
+          <p className="text-gray-300 text-lg">Dungeon Master Interface</p>
         </header>
         <DMDashboard />
       </div>
