@@ -19,6 +19,7 @@ import {
   Shield,
   Zap,
   Package,
+  Scroll,
 } from 'lucide-react'
 
 interface NavItem {
@@ -64,6 +65,12 @@ const navigationItems: NavItem[] = [
     href: '/maps',
     icon: Map,
     description: 'Mapas del mundo y ubicaciones',
+  },
+  {
+    title: 'Lore y Tradiciones',
+    href: '/lore',
+    icon: Scroll,
+    description: 'Historia, leyendas y conocimiento del mundo',
   },
   {
     title: 'Notas de Campaña',

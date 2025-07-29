@@ -13,7 +13,13 @@
       "Bash(npm run format:*)",
       "Bash(npm run build:*)",
       "Bash(git push:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(git add:*)",
+      "Bash(tput:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(rm:*)",
+      "Bash(npm run lint)"
     ],
     "deny": []
   }

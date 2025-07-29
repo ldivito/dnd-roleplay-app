@@ -6,6 +6,8 @@ import type { DiceRoll, Initiative } from '@/types/dice'
 import type { Spell } from '@/types/spell'
 import type { Item } from '@/types/item'
 import type { AnyLocation, LocationType } from '@/types/location'
+import type { Lore, Era } from '@/types/lore'
+import { DEFAULT_ERAS } from '@/types/lore'
 
 interface SessionState {
   currentSession: Session | null
@@ -16,6 +18,8 @@ interface SessionState {
   spells: Spell[]
   items: Item[]
   locations: AnyLocation[]
+  lore: Lore[]
+  eras: Era[]
 
   // Actions
   createSession: (
@@ -45,6 +49,17 @@ interface SessionState {
   getLocationsByType: (type: LocationType) => AnyLocation[]
   getLocationHierarchy: () => AnyLocation[]
 
+  addLore: (lore: Lore) => void
+  updateLore: (loreId: string, updates: Partial<Lore>) => void
+  removeLore: (loreId: string) => void
+  getLoreByImportance: (importance: 'main' | 'secondary' | 'minor') => Lore[]
+  getMainTimelineLore: () => Lore[]
+  getLoreByEntity: (entityType: string, entityId: string) => Lore[]
+
+  addEra: (era: Era) => void
+  updateEra: (eraId: string, updates: Partial<Era>) => void
+  removeEra: (eraId: string) => void
+
   setInitiatives: (initiatives: Initiative[]) => void
   addDiceRoll: (roll: DiceRoll) => void
   clearDiceHistory: () => void
@@ -61,6 +76,8 @@ export const useSessionStore = create<SessionState>()(
       spells: [],
       items: [],
       locations: [],
+      lore: [],
+      eras: DEFAULT_ERAS,
 
       createSession: sessionData => {
         const session: Session = {
@@ -283,6 +300,74 @@ export const useSessionStore = create<SessionState>()(
         return hierarchy
       },
 
+      addLore: lore => {
+        set(state => ({
+          lore: [...state.lore, lore],
+        }))
+      },
+
+      updateLore: (loreId, updates) => {
+        set(state => ({
+          lore: state.lore.map(lore =>
+            lore.id === loreId
+              ? { ...lore, ...updates, updatedAt: new Date() }
+              : lore
+          ),
+        }))
+      },
+
+      removeLore: loreId => {
+        set(state => ({
+          lore: state.lore.filter(lore => lore.id !== loreId),
+        }))
+      },
+
+      getLoreByImportance: importance => {
+        const { lore } = get()
+        return lore.filter(l => l.importance === importance)
+      },
+
+      getMainTimelineLore: () => {
+        const { lore } = get()
+        return lore
+          .filter(l => l.isMainTimeline)
+          .sort((a, b) => {
+            if (a.year !== undefined && b.year !== undefined) {
+              return a.year - b.year
+            }
+            return a.createdAt.getTime() - b.createdAt.getTime()
+          })
+      },
+
+      getLoreByEntity: (entityType, entityId) => {
+        const { lore } = get()
+        return lore.filter(l =>
+          l.connections.some(
+            conn => conn.type === entityType && conn.entityId === entityId
+          )
+        )
+      },
+
+      addEra: era => {
+        set(state => ({
+          eras: [...state.eras, era],
+        }))
+      },
+
+      updateEra: (eraId, updates) => {
+        set(state => ({
+          eras: state.eras.map(era =>
+            era.id === eraId ? { ...era, ...updates } : era
+          ),
+        }))
+      },
+
+      removeEra: eraId => {
+        set(state => ({
+          eras: state.eras.filter(era => era.id !== eraId),
+        }))
+      },
+
       setInitiatives: initiatives => {
         set({ initiatives })
       },
@@ -306,6 +391,8 @@ export const useSessionStore = create<SessionState>()(
         spells: state.spells,
         items: state.items,
         locations: state.locations,
+        lore: state.lore,
+        eras: state.eras,
         diceHistory: state.diceHistory,
       }),
     }
