@@ -5,6 +5,7 @@ import type { Character } from '@/types/character'
 import type { DiceRoll, Initiative } from '@/types/dice'
 import type { Spell } from '@/types/spell'
 import type { Item } from '@/types/item'
+import type { AnyLocation, LocationType } from '@/types/location'
 
 interface SessionState {
   currentSession: Session | null
@@ -14,6 +15,7 @@ interface SessionState {
   diceHistory: DiceRoll[]
   spells: Spell[]
   items: Item[]
+  locations: AnyLocation[]
 
   // Actions
   createSession: (
@@ -36,6 +38,13 @@ interface SessionState {
   updateItem: (itemId: string, updates: Partial<Item>) => void
   removeItem: (itemId: string) => void
 
+  addLocation: (location: AnyLocation) => void
+  updateLocation: (locationId: string, updates: Partial<AnyLocation>) => void
+  removeLocation: (locationId: string) => void
+  getLocationChildren: (parentId: string) => AnyLocation[]
+  getLocationsByType: (type: LocationType) => AnyLocation[]
+  getLocationHierarchy: () => AnyLocation[]
+
   setInitiatives: (initiatives: Initiative[]) => void
   addDiceRoll: (roll: DiceRoll) => void
   clearDiceHistory: () => void
@@ -51,6 +60,7 @@ export const useSessionStore = create<SessionState>()(
       diceHistory: [],
       spells: [],
       items: [],
+      locations: [],
 
       createSession: sessionData => {
         const session: Session = {
@@ -182,6 +192,97 @@ export const useSessionStore = create<SessionState>()(
         }))
       },
 
+      addLocation: location => {
+        set(state => ({
+          locations: [...state.locations, location],
+        }))
+      },
+
+      updateLocation: (locationId, updates) => {
+        set(state => ({
+          locations: state.locations.map(location =>
+            location.id === locationId
+              ? ({
+                  ...location,
+                  ...updates,
+                  updatedAt: new Date(),
+                } as AnyLocation)
+              : location
+          ),
+        }))
+      },
+
+      removeLocation: locationId => {
+        set(state => {
+          // Remove the location and all its children recursively
+          const removeLocationAndChildren = (
+            locations: AnyLocation[],
+            targetId: string
+          ): AnyLocation[] => {
+            return locations.filter(location => {
+              if (location.id === targetId) {
+                return false
+              }
+              // Remove children of the target location
+              if (location.parentId === targetId) {
+                return false
+              }
+              return true
+            })
+          }
+
+          let filteredLocations = state.locations.filter(
+            loc => loc.id !== locationId
+          )
+
+          // Keep removing children until no more are found
+          let previousLength
+          do {
+            previousLength = filteredLocations.length
+            filteredLocations = filteredLocations.filter(
+              location =>
+                !state.locations.some(
+                  loc => loc.id === locationId && location.parentId === loc.id
+                ) &&
+                filteredLocations.some(
+                  loc => loc.id === location.parentId || !location.parentId
+                )
+            )
+          } while (filteredLocations.length !== previousLength)
+
+          return { locations: filteredLocations }
+        })
+      },
+
+      getLocationChildren: parentId => {
+        const { locations } = get()
+        return locations.filter(location => location.parentId === parentId)
+      },
+
+      getLocationsByType: type => {
+        const { locations } = get()
+        return locations.filter(location => location.type === type)
+      },
+
+      getLocationHierarchy: () => {
+        const { locations } = get()
+        // Return locations organized in hierarchy (planes first, then their children, etc.)
+        const hierarchy: AnyLocation[] = []
+        const addLocationWithChildren = (parentId?: string, level = 0) => {
+          const children = locations
+            .filter(loc => loc.parentId === parentId)
+            .sort((a, b) => a.name.localeCompare(b.name))
+
+          children.forEach(child => {
+            hierarchy.push(child)
+            addLocationWithChildren(child.id, level + 1)
+          })
+        }
+
+        addLocationWithChildren() // Start with root locations (planes)
+        return hierarchy
+      },
+
       setInitiatives: initiatives => {
         set({ initiatives })
       },
@@ -204,6 +305,7 @@ export const useSessionStore = create<SessionState>()(
         characters: state.characters,
         spells: state.spells,
         items: state.items,
+        locations: state.locations,
         diceHistory: state.diceHistory,
       }),
     }
