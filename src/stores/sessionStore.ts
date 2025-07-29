@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware'
 import type { Session, Campaign } from '@/types/session'
 import type { Character } from '@/types/character'
 import type { DiceRoll, Initiative } from '@/types/dice'
+import type { Spell } from '@/types/spell'
+import type { Item } from '@/types/item'
 
 interface SessionState {
   currentSession: Session | null
@@ -10,6 +12,8 @@ interface SessionState {
   characters: Character[]
   initiatives: Initiative[]
   diceHistory: DiceRoll[]
+  spells: Spell[]
+  items: Item[]
 
   // Actions
   createSession: (
@@ -24,6 +28,14 @@ interface SessionState {
   updateCharacter: (characterId: string, updates: Partial<Character>) => void
   removeCharacter: (characterId: string) => void
 
+  addSpell: (spell: Spell) => void
+  updateSpell: (spellId: string, updates: Partial<Spell>) => void
+  removeSpell: (spellId: string) => void
+
+  addItem: (item: Item) => void
+  updateItem: (itemId: string, updates: Partial<Item>) => void
+  removeItem: (itemId: string) => void
+
   setInitiatives: (initiatives: Initiative[]) => void
   addDiceRoll: (roll: DiceRoll) => void
   clearDiceHistory: () => void
@@ -37,6 +49,8 @@ export const useSessionStore = create<SessionState>()(
       characters: [],
       initiatives: [],
       diceHistory: [],
+      spells: [],
+      items: [],
 
       createSession: sessionData => {
         const session: Session = {
@@ -124,6 +138,50 @@ export const useSessionStore = create<SessionState>()(
         }))
       },
 
+      addSpell: spell => {
+        set(state => ({
+          spells: [...state.spells, spell],
+        }))
+      },
+
+      updateSpell: (spellId, updates) => {
+        set(state => ({
+          spells: state.spells.map(spell =>
+            spell.id === spellId
+              ? { ...spell, ...updates, updatedAt: new Date() }
+              : spell
+          ),
+        }))
+      },
+
+      removeSpell: spellId => {
+        set(state => ({
+          spells: state.spells.filter(spell => spell.id !== spellId),
+        }))
+      },
+
+      addItem: item => {
+        set(state => ({
+          items: [...state.items, item],
+        }))
+      },
+
+      updateItem: (itemId, updates) => {
+        set(state => ({
+          items: state.items.map(item =>
+            item.id === itemId
+              ? { ...item, ...updates, updatedAt: new Date() }
+              : item
+          ),
+        }))
+      },
+
+      removeItem: itemId => {
+        set(state => ({
+          items: state.items.filter(item => item.id !== itemId),
+        }))
+      },
+
       setInitiatives: initiatives => {
         set({ initiatives })
       },
@@ -144,6 +202,8 @@ export const useSessionStore = create<SessionState>()(
         currentSession: state.currentSession,
         currentCampaign: state.currentCampaign,
         characters: state.characters,
+        spells: state.spells,
+        items: state.items,
         diceHistory: state.diceHistory,
       }),
     }

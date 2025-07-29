@@ -18,6 +18,7 @@ import {
   Crown,
   Shield,
   Zap,
+  Package,
 } from 'lucide-react'
 
 interface NavItem {
@@ -71,10 +72,16 @@ const navigationItems: NavItem[] = [
     description: 'Notas de historia y lore',
   },
   {
-    title: 'Hechizos y Objetos',
-    href: '/compendium',
+    title: 'Hechizos',
+    href: '/compendium/spells',
     icon: Zap,
-    description: 'Objetos mágicos y hechizos',
+    description: 'Biblioteca de hechizos',
+  },
+  {
+    title: 'Objetos',
+    href: '/compendium/items',
+    icon: Package,
+    description: 'Equipo y objetos mágicos',
   },
 ]
 
