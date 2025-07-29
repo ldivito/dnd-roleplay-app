@@ -8,6 +8,7 @@ import type { Item } from '@/types/item'
 import type { AnyLocation, LocationType } from '@/types/location'
 import type { Lore, Era } from '@/types/lore'
 import { DEFAULT_ERAS } from '@/types/lore'
+import type { NPC } from '@/types/npc'
 
 interface SessionState {
   currentSession: Session | null
@@ -20,6 +21,7 @@ interface SessionState {
   locations: AnyLocation[]
   lore: Lore[]
   eras: Era[]
+  npcs: NPC[]
 
   // Actions
   createSession: (
@@ -60,6 +62,14 @@ interface SessionState {
   updateEra: (eraId: string, updates: Partial<Era>) => void
   removeEra: (eraId: string) => void
 
+  addNPC: (npc: NPC) => void
+  updateNPC: (npcId: string, updates: Partial<NPC>) => void
+  removeNPC: (npcId: string) => void
+  getNPCsByType: (type: string) => NPC[]
+  getNPCsByImportance: (importance: string) => NPC[]
+  getNPCsByLocation: (locationId: string) => NPC[]
+  getNPCsWithRelationships: () => NPC[]
+
   setInitiatives: (initiatives: Initiative[]) => void
   addDiceRoll: (roll: DiceRoll) => void
   clearDiceHistory: () => void
@@ -78,6 +88,7 @@ export const useSessionStore = create<SessionState>()(
       locations: [],
       lore: [],
       eras: DEFAULT_ERAS,
+      npcs: [],
 
       createSession: sessionData => {
         const session: Session = {
@@ -368,6 +379,52 @@ export const useSessionStore = create<SessionState>()(
         }))
       },
 
+      addNPC: npc => {
+        set(state => ({
+          npcs: [...state.npcs, npc],
+        }))
+      },
+
+      updateNPC: (npcId, updates) => {
+        set(state => ({
+          npcs: state.npcs.map(npc =>
+            npc.id === npcId
+              ? { ...npc, ...updates, updatedAt: new Date() }
+              : npc
+          ),
+        }))
+      },
+
+      removeNPC: npcId => {
+        set(state => ({
+          npcs: state.npcs.filter(npc => npc.id !== npcId),
+        }))
+      },
+
+      getNPCsByType: type => {
+        const { npcs } = get()
+        return npcs.filter(npc => npc.npcType === type)
+      },
+
+      getNPCsByImportance: importance => {
+        const { npcs } = get()
+        return npcs.filter(npc => npc.importance === importance)
+      },
+
+      getNPCsByLocation: locationId => {
+        const { npcs } = get()
+        return npcs.filter(
+          npc =>
+            npc.currentLocation === locationId ||
+            npc.locationRelations.some(rel => rel.locationId === locationId)
+        )
+      },
+
+      getNPCsWithRelationships: () => {
+        const { npcs } = get()
+        return npcs.filter(npc => npc.relationships.length > 0)
+      },
+
       setInitiatives: initiatives => {
         set({ initiatives })
       },
@@ -393,6 +450,7 @@ export const useSessionStore = create<SessionState>()(
         locations: state.locations,
         lore: state.lore,
         eras: state.eras,
+        npcs: state.npcs,
         diceHistory: state.diceHistory,
       }),
     }

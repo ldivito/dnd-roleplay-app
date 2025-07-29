@@ -46,7 +46,13 @@ const navigationItems: NavItem[] = [
     title: 'Personajes',
     href: '/characters',
     icon: Users,
-    description: 'Gestión de jugadores y NPCs',
+    description: 'Gestión de jugadores',
+  },
+  {
+    title: 'NPCs',
+    href: '/npcs',
+    icon: Users,
+    description: 'Personajes no jugadores',
   },
   {
     title: 'Combate',
