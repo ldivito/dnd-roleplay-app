@@ -1,44 +1,77 @@
 'use client'
 
 import React from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Play, Dice1, UserPlus, FileText } from 'lucide-react'
 
 export default function DMDashboard() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h3 className="text-xl font-semibold mb-4">Session Status</h3>
-        <div className="space-y-2">
-          <p className="text-sm text-gray-300">Session: Not Started</p>
-          <p className="text-sm text-gray-300">Players: 0/6</p>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mt-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Play className="h-5 w-5" />
+            Session Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Status:</span>
+              <span className="font-medium">Not Started</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Players:</span>
+              <span className="font-medium">0/6</span>
+            </div>
+          </div>
+          <Button className="w-full">
+            <Play className="h-4 w-4 mr-2" />
             Start Session
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardContent>
+      </Card>
 
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h3 className="text-xl font-semibold mb-4">Quick Actions</h3>
-        <div className="space-y-2">
-          <button className="block w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button variant="outline" className="w-full justify-start">
+            <Dice1 className="h-4 w-4 mr-2" />
             Roll Initiative
-          </button>
-          <button className="block w-full bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded">
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            <UserPlus className="h-4 w-4 mr-2" />
             Add NPC
-          </button>
-          <button className="block w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            <FileText className="h-4 w-4 mr-2" />
             Quick Note
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardContent>
+      </Card>
 
-      <div className="bg-gray-800 rounded-lg p-6">
-        <h3 className="text-xl font-semibold mb-4">Campaign Info</h3>
-        <div className="space-y-2">
-          <p className="text-sm text-gray-300">Campaign: New Adventure</p>
-          <p className="text-sm text-gray-300">Session: #1</p>
-          <p className="text-sm text-gray-300">Location: Tavern</p>
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Campaign Info</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Campaign:</span>
+            <span className="font-medium">New Adventure</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Session:</span>
+            <span className="font-medium">#1</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Location:</span>
+            <span className="font-medium">Tavern</span>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

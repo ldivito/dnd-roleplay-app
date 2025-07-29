@@ -11,7 +11,9 @@
       "Bash(npx husky:*)",
       "Bash(npx husky add:*)",
       "Bash(npm run format:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git push:*)",
+      "Bash(npx:*)"
     ],
     "deny": []
   }
