@@ -7,9 +7,9 @@ export default function SettingsPage() {
     <AppLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Configuración</h1>
           <p className="text-muted-foreground">
-            Configure application preferences and campaign settings.
+            Configura las preferencias de la aplicación y ajustes de campaña.
           </p>
         </div>
 
@@ -17,12 +17,12 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5" />
-              Application Settings
+              Configuración de Aplicación
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Settings configuration coming soon...
+              La configuración de ajustes estará disponible pronto...
             </p>
           </CardContent>
         </Card>

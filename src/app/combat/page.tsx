@@ -7,9 +7,11 @@ export default function CombatPage() {
     <AppLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Combat Tracker</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Rastreador de Combate
+          </h1>
           <p className="text-muted-foreground">
-            Manage initiative order and combat encounters.
+            Gestiona el orden de iniciativa y encuentros de combate.
           </p>
         </div>
 
@@ -17,12 +19,12 @@ export default function CombatPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sword className="h-5 w-5" />
-              Initiative & Combat
+              Iniciativa y Combate
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Combat tracking features coming soon...
+              Las funciones de rastreo de combate estarán disponibles pronto...
             </p>
           </CardContent>
         </Card>

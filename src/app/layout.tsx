@@ -3,8 +3,8 @@ import './globals.css'
 import ErrorBoundary from '@/components/ErrorBoundary'
 
 export const metadata: Metadata = {
-  title: 'D&D Roleplay Session',
-  description: 'Dungeon Master interface for D&D roleplay sessions',
+  title: 'Sesión de Rol D&D',
+  description: 'Interfaz de Dungeon Master para sesiones de rol de D&D',
 }
 
 export default function RootLayout({

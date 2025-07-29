@@ -7,9 +7,12 @@ export default function NotesPage() {
     <AppLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Campaign Notes</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Notas de Campaña
+          </h1>
           <p className="text-muted-foreground">
-            Keep track of story notes, NPC details, and campaign lore.
+            Mantén un registro de notas de historia, detalles de NPCs y lore de
+            la campaña.
           </p>
         </div>
 
@@ -17,12 +20,12 @@ export default function NotesPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              Story & Lore Notes
+              Notas de Historia y Lore
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Note-taking features coming soon...
+              Las funciones de toma de notas estarán disponibles pronto...
             </p>
           </CardContent>
         </Card>

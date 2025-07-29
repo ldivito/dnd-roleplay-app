@@ -7,9 +7,11 @@ export default function CompendiumPage() {
     <AppLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Spells & Items</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Hechizos y Objetos
+          </h1>
           <p className="text-muted-foreground">
-            Browse and manage spells, magic items, and equipment.
+            Explora y gestiona hechizos, objetos mágicos y equipamiento.
           </p>
         </div>
 
@@ -17,12 +19,12 @@ export default function CompendiumPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5" />
-              Magic Compendium
+              Compendio Mágico
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Compendium features coming soon...
+              Las funciones del compendio estarán disponibles pronto...
             </p>
           </CardContent>
         </Card>

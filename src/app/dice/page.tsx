@@ -7,9 +7,11 @@ export default function DicePage() {
     <AppLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dice Roller</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Tirador de Dados
+          </h1>
           <p className="text-muted-foreground">
-            Roll dice for various game mechanics and track results.
+            Tira dados para varias mecánicas de juego y rastrea los resultados.
           </p>
         </div>
 
@@ -17,12 +19,12 @@ export default function DicePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Dice1 className="h-5 w-5" />
-              Dice Rolling Tools
+              Herramientas de Dados
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Dice rolling features coming soon...
+              Las funciones de tirada de dados estarán disponibles pronto...
             </p>
           </CardContent>
         </Card>

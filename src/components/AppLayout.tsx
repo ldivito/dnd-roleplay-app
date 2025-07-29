@@ -41,7 +41,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
           <div className="flex items-center gap-x-4 lg:gap-x-6">
-            <h1 className="text-lg font-semibold">D&D Campaign Manager</h1>
+            <h1 className="text-lg font-semibold">Gestor de Campañas D&D</h1>
           </div>
         </div>
       </div>

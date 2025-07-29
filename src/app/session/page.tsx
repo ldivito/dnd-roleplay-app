@@ -8,10 +8,10 @@ export default function SessionPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Session Management
+            Gestión de Sesión
           </h1>
           <p className="text-muted-foreground">
-            Control your current D&D session and track progress.
+            Controla tu sesión actual de D&D y rastrea el progreso.
           </p>
         </div>
 
@@ -19,12 +19,12 @@ export default function SessionPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Crown className="h-5 w-5" />
-              Session Controls
+              Controles de Sesión
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Session management features coming soon...
+              Las funciones de gestión de sesión estarán disponibles pronto...
             </p>
           </CardContent>
         </Card>

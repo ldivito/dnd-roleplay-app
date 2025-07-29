@@ -29,61 +29,61 @@ interface NavItem {
 
 const navigationItems: NavItem[] = [
   {
-    title: 'Dashboard',
+    title: 'Tablero',
     href: '/',
     icon: Home,
-    description: 'Main DM control panel',
+    description: 'Panel principal del DM',
   },
   {
-    title: 'Session',
+    title: 'Sesión',
     href: '/session',
     icon: Crown,
-    description: 'Current session management',
+    description: 'Gestión de sesión actual',
   },
   {
-    title: 'Characters',
+    title: 'Personajes',
     href: '/characters',
     icon: Users,
-    description: 'Player & NPC management',
+    description: 'Gestión de jugadores y NPCs',
   },
   {
-    title: 'Combat',
+    title: 'Combate',
     href: '/combat',
     icon: Sword,
-    description: 'Initiative & combat tracker',
+    description: 'Iniciativa y rastreador de combate',
   },
   {
-    title: 'Dice Roller',
+    title: 'Dados',
     href: '/dice',
     icon: Dice1,
-    description: 'Dice rolling utilities',
+    description: 'Utilidades de dados',
   },
   {
-    title: 'Maps & Locations',
+    title: 'Mapas y Ubicaciones',
     href: '/maps',
     icon: Map,
-    description: 'World maps and locations',
+    description: 'Mapas del mundo y ubicaciones',
   },
   {
-    title: 'Campaign Notes',
+    title: 'Notas de Campaña',
     href: '/notes',
     icon: BookOpen,
-    description: 'Story notes and lore',
+    description: 'Notas de historia y lore',
   },
   {
-    title: 'Spells & Items',
+    title: 'Hechizos y Objetos',
     href: '/compendium',
     icon: Zap,
-    description: 'Magic items and spells',
+    description: 'Objetos mágicos y hechizos',
   },
 ]
 
 const adminItems: NavItem[] = [
   {
-    title: 'Settings',
+    title: 'Configuración',
     href: '/settings',
     icon: Settings,
-    description: 'App configuration',
+    description: 'Configuración de la aplicación',
   },
 ]
 
@@ -101,12 +101,12 @@ export default function Sidebar({ className }: SidebarProps) {
           <div className="flex items-center gap-2 mb-4">
             <Shield className="h-6 w-6 text-primary" />
             <h2 className="text-lg font-semibold tracking-tight">
-              DM Control Panel
+              Panel de Control DM
             </h2>
           </div>
           <div className="space-y-1">
             <h3 className="mb-2 px-4 text-sm font-semibold tracking-tight text-muted-foreground">
-              Campaign Tools
+              Herramientas de Campaña
             </h3>
             <ScrollArea className="h-[400px] px-1">
               {navigationItems.map(item => {
@@ -138,7 +138,7 @@ export default function Sidebar({ className }: SidebarProps) {
 
         <div className="px-3 py-2">
           <h3 className="mb-2 px-4 text-sm font-semibold tracking-tight text-muted-foreground">
-            Administration
+            Administración
           </h3>
           <div className="space-y-1">
             {adminItems.map(item => {

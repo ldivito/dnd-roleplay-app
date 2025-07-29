@@ -12,63 +12,63 @@ export default function DMDashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Play className="h-5 w-5" />
-            Session Status
+            Estado de Sesión
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Status:</span>
-              <span className="font-medium">Not Started</span>
+              <span className="text-muted-foreground">Estado:</span>
+              <span className="font-medium">No Iniciada</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Players:</span>
+              <span className="text-muted-foreground">Jugadores:</span>
               <span className="font-medium">0/6</span>
             </div>
           </div>
           <Button className="w-full">
             <Play className="h-4 w-4 mr-2" />
-            Start Session
+            Iniciar Sesión
           </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+          <CardTitle>Acciones Rápidas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <Button variant="outline" className="w-full justify-start">
             <Dice1 className="h-4 w-4 mr-2" />
-            Roll Initiative
+            Tirar Iniciativa
           </Button>
           <Button variant="outline" className="w-full justify-start">
             <UserPlus className="h-4 w-4 mr-2" />
-            Add NPC
+            Agregar NPC
           </Button>
           <Button variant="outline" className="w-full justify-start">
             <FileText className="h-4 w-4 mr-2" />
-            Quick Note
+            Nota Rápida
           </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Campaign Info</CardTitle>
+          <CardTitle>Información de Campaña</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Campaign:</span>
-            <span className="font-medium">New Adventure</span>
+            <span className="text-muted-foreground">Campaña:</span>
+            <span className="font-medium">Nueva Aventura</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Session:</span>
+            <span className="text-muted-foreground">Sesión:</span>
             <span className="font-medium">#1</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Location:</span>
-            <span className="font-medium">Tavern</span>
+            <span className="text-muted-foreground">Ubicación:</span>
+            <span className="font-medium">Taberna</span>
           </div>
         </CardContent>
       </Card>

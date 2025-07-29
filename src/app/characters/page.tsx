@@ -7,9 +7,9 @@ export default function CharactersPage() {
     <AppLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Characters</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Personajes</h1>
           <p className="text-muted-foreground">
-            Manage player characters and NPCs in your campaign.
+            Gestiona los personajes de los jugadores y NPCs en tu campaña.
           </p>
         </div>
 
@@ -17,12 +17,13 @@ export default function CharactersPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Character Management
+              Gestión de Personajes
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Character management features coming soon...
+              Las funciones de gestión de personajes estarán disponibles
+              pronto...
             </p>
           </CardContent>
         </Card>
