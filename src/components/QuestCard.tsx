@@ -44,12 +44,20 @@ export function QuestCard({
   const priorityInfo = getQuestPriorityInfo(quest.priority)
   const timeline = calculateQuestProgress(quest)
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
+    if (!date) return 'N/A'
+
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+
+    if (isNaN(dateObj.getTime())) {
+      return 'Fecha inválida'
+    }
+
     return new Intl.DateTimeFormat('es-ES', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
-    }).format(date)
+    }).format(dateObj)
   }
 
   const getStatusIcon = () => {

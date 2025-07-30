@@ -781,7 +781,240 @@ export function QuestForm({ quest, onSubmit, onCancel }: QuestFormProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Similar dialogs would be implemented for Rewards and Connections */}
+      {/* Reward Dialog */}
+      <Dialog open={isRewardDialogOpen} onOpenChange={setIsRewardDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {editingReward ? 'Editar Recompensa' : 'Nueva Recompensa'}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Tipo *</Label>
+                <Select
+                  value={rewardForm.type || 'experience'}
+                  onValueChange={value =>
+                    setRewardForm(prev => ({ ...prev, type: value as any }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {REWARD_TYPES.map(type => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.icon} {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {(rewardForm.type === 'experience' ||
+                rewardForm.type === 'gold') && (
+                <div className="space-y-2">
+                  <Label>Cantidad</Label>
+                  <Input
+                    type="number"
+                    value={rewardForm.amount || ''}
+                    onChange={e =>
+                      setRewardForm(prev => ({
+                        ...prev,
+                        amount: parseInt(e.target.value) || 0,
+                      }))
+                    }
+                    placeholder="0"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Descripción *</Label>
+              <Textarea
+                value={rewardForm.description || ''}
+                onChange={e =>
+                  setRewardForm(prev => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                placeholder="Describe la recompensa"
+                rows={3}
+              />
+            </div>
+
+            {rewardForm.type === 'item' && (
+              <div className="space-y-2">
+                <Label>Nombre del Objeto</Label>
+                <Input
+                  value={rewardForm.itemName || ''}
+                  onChange={e =>
+                    setRewardForm(prev => ({
+                      ...prev,
+                      itemName: e.target.value,
+                    }))
+                  }
+                  placeholder="Nombre del objeto"
+                />
+              </div>
+            )}
+
+            {rewardForm.type === 'other' && (
+              <div className="space-y-2">
+                <Label>Valor Personalizado</Label>
+                <Input
+                  value={rewardForm.customValue || ''}
+                  onChange={e =>
+                    setRewardForm(prev => ({
+                      ...prev,
+                      customValue: e.target.value,
+                    }))
+                  }
+                  placeholder="Valor personalizado"
+                />
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsRewardDialogOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button type="button" onClick={saveReward}>
+                {editingReward ? 'Actualizar' : 'Agregar'} Recompensa
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Connection Dialog */}
+      <Dialog
+        open={isConnectionDialogOpen}
+        onOpenChange={setIsConnectionDialogOpen}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {editingConnection ? 'Editar Conexión' : 'Nueva Conexión'}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Tipo de Entidad *</Label>
+                <Select
+                  value={connectionForm.type || 'npc'}
+                  onValueChange={value =>
+                    setConnectionForm(prev => ({ ...prev, type: value as any }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="npc">NPC</SelectItem>
+                    <SelectItem value="location">Ubicación</SelectItem>
+                    <SelectItem value="item">Objeto</SelectItem>
+                    <SelectItem value="lore">Historia/Lore</SelectItem>
+                    <SelectItem value="character">Personaje</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Tipo de Relación *</Label>
+                <Select
+                  value={connectionForm.relationshipType || 'involved'}
+                  onValueChange={value =>
+                    setConnectionForm(prev => ({
+                      ...prev,
+                      relationshipType: value as any,
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CONNECTION_TYPES.map(type => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Nombre de la Entidad *</Label>
+                <Input
+                  value={connectionForm.entityName || ''}
+                  onChange={e =>
+                    setConnectionForm(prev => ({
+                      ...prev,
+                      entityName: e.target.value,
+                    }))
+                  }
+                  placeholder="Nombre"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>ID de la Entidad *</Label>
+                <Input
+                  value={connectionForm.entityId || ''}
+                  onChange={e =>
+                    setConnectionForm(prev => ({
+                      ...prev,
+                      entityId: e.target.value,
+                    }))
+                  }
+                  placeholder="ID único (generar si es nuevo)"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Descripción</Label>
+              <Textarea
+                value={connectionForm.description || ''}
+                onChange={e =>
+                  setConnectionForm(prev => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                placeholder="Describe la conexión con la misión"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsConnectionDialogOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button type="button" onClick={saveConnection}>
+                {editingConnection ? 'Actualizar' : 'Agregar'} Conexión
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </form>
   )
 }

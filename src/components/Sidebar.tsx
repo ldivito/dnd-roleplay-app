@@ -21,6 +21,7 @@ import {
   Package,
   Scroll,
   Target,
+  Building,
 } from 'lucide-react'
 
 interface NavItem {
@@ -84,6 +85,12 @@ const navigationItems: NavItem[] = [
     href: '/quests',
     icon: Target,
     description: 'Sistema de misiones y objetivos',
+  },
+  {
+    title: 'Grupos y Facciones',
+    href: '/factions',
+    icon: Building,
+    description: 'Organizaciones, gremios y facciones',
   },
   {
     title: 'Notas de Campaña',

@@ -9,6 +9,8 @@ import type { AnyLocation, LocationType } from '@/types/location'
 import type { Lore, Era } from '@/types/lore'
 import { DEFAULT_ERAS } from '@/types/lore'
 import type { NPC } from '@/types/npc'
+import type { Quest } from '@/types/quest'
+import type { Faction } from '@/types/faction'
 
 interface SessionState {
   currentSession: Session | null
@@ -22,6 +24,8 @@ interface SessionState {
   lore: Lore[]
   eras: Era[]
   npcs: NPC[]
+  quests: Quest[]
+  factions: Faction[]
 
   // Actions
   createSession: (
@@ -70,6 +74,22 @@ interface SessionState {
   getNPCsByLocation: (locationId: string) => NPC[]
   getNPCsWithRelationships: () => NPC[]
 
+  addQuest: (quest: Quest) => void
+  updateQuest: (questId: string, updates: Partial<Quest>) => void
+  removeQuest: (questId: string) => void
+  getQuestsByStatus: (status: string) => Quest[]
+  getQuestsByType: (type: string) => Quest[]
+  getActiveQuests: () => Quest[]
+  getCompletedQuests: () => Quest[]
+
+  addFaction: (faction: Faction) => void
+  updateFaction: (factionId: string, updates: Partial<Faction>) => void
+  removeFaction: (factionId: string) => void
+  getFactionsByType: (type: string) => Faction[]
+  getFactionsByStatus: (status: string) => Faction[]
+  getActiveFactions: () => Faction[]
+  getFactionsByInfluence: (influence: string) => Faction[]
+
   setInitiatives: (initiatives: Initiative[]) => void
   addDiceRoll: (roll: DiceRoll) => void
   clearDiceHistory: () => void
@@ -89,6 +109,8 @@ export const useSessionStore = create<SessionState>()(
       lore: [],
       eras: DEFAULT_ERAS,
       npcs: [],
+      quests: [],
+      factions: [],
 
       createSession: sessionData => {
         const session: Session = {
@@ -425,6 +447,90 @@ export const useSessionStore = create<SessionState>()(
         return npcs.filter(npc => npc.relationships.length > 0)
       },
 
+      addQuest: quest => {
+        set(state => ({
+          quests: [...state.quests, quest],
+        }))
+      },
+
+      updateQuest: (questId, updates) => {
+        set(state => ({
+          quests: state.quests.map(quest =>
+            quest.id === questId
+              ? { ...quest, ...updates, updatedAt: new Date() }
+              : quest
+          ),
+        }))
+      },
+
+      removeQuest: questId => {
+        set(state => ({
+          quests: state.quests.filter(quest => quest.id !== questId),
+        }))
+      },
+
+      getQuestsByStatus: status => {
+        const { quests } = get()
+        return quests.filter(quest => quest.status === status)
+      },
+
+      getQuestsByType: type => {
+        const { quests } = get()
+        return quests.filter(quest => quest.type === type)
+      },
+
+      getActiveQuests: () => {
+        const { quests } = get()
+        return quests.filter(quest => quest.status === 'active')
+      },
+
+      getCompletedQuests: () => {
+        const { quests } = get()
+        return quests.filter(quest => quest.status === 'completed')
+      },
+
+      addFaction: faction => {
+        set(state => ({
+          factions: [...state.factions, faction],
+        }))
+      },
+
+      updateFaction: (factionId, updates) => {
+        set(state => ({
+          factions: state.factions.map(faction =>
+            faction.id === factionId
+              ? { ...faction, ...updates, updatedAt: new Date() }
+              : faction
+          ),
+        }))
+      },
+
+      removeFaction: factionId => {
+        set(state => ({
+          factions: state.factions.filter(faction => faction.id !== factionId),
+        }))
+      },
+
+      getFactionsByType: type => {
+        const { factions } = get()
+        return factions.filter(faction => faction.type === type)
+      },
+
+      getFactionsByStatus: status => {
+        const { factions } = get()
+        return factions.filter(faction => faction.status === status)
+      },
+
+      getActiveFactions: () => {
+        const { factions } = get()
+        return factions.filter(faction => faction.status === 'active')
+      },
+
+      getFactionsByInfluence: influence => {
+        const { factions } = get()
+        return factions.filter(faction => faction.influence === influence)
+      },
+
       setInitiatives: initiatives => {
         set({ initiatives })
       },
@@ -451,8 +557,49 @@ export const useSessionStore = create<SessionState>()(
         lore: state.lore,
         eras: state.eras,
         npcs: state.npcs,
+        quests: state.quests,
+        factions: state.factions,
         diceHistory: state.diceHistory,
       }),
+      onRehydrateStorage: () => state => {
+        if (state?.quests) {
+          state.quests = state.quests.map(quest => ({
+            ...quest,
+            createdAt: new Date(quest.createdAt),
+            updatedAt: new Date(quest.updatedAt),
+            lastUpdated: new Date(quest.lastUpdated),
+            ...(quest.startDate && { startDate: new Date(quest.startDate) }),
+            ...(quest.completedDate && {
+              completedDate: new Date(quest.completedDate),
+            }),
+            actions: quest.actions.map(action => ({
+              ...action,
+              ...(action.completedAt && {
+                completedAt: new Date(action.completedAt),
+              }),
+            })),
+          }))
+        }
+
+        if (state?.factions) {
+          state.factions = state.factions.map(faction => ({
+            ...faction,
+            createdAt: new Date(faction.createdAt),
+            updatedAt: new Date(faction.updatedAt),
+            ...(faction.foundedDate && {
+              foundedDate: new Date(faction.foundedDate),
+            }),
+            goals: faction.goals.map(goal => ({
+              ...goal,
+              ...(goal.deadline && { deadline: new Date(goal.deadline) }),
+            })),
+            relationships: faction.relationships.map(rel => ({
+              ...rel,
+              lastUpdated: new Date(rel.lastUpdated),
+            })),
+          }))
+        }
+      },
     }
   )
 )
