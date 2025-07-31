@@ -22,6 +22,7 @@ import {
   Building,
   Library,
   Database,
+  Calendar,
 } from 'lucide-react'
 
 interface NavItem {
@@ -44,6 +45,12 @@ const coreToolsItems: NavItem[] = [
     href: '/session',
     icon: Crown,
     description: 'Gestión de sesión actual',
+  },
+  {
+    title: 'Calendario',
+    href: '/calendar',
+    icon: Calendar,
+    description: 'Sistema de calendario personalizado',
   },
   {
     title: 'Combate',

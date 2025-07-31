@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import AppLayout from '@/components/AppLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -223,157 +222,152 @@ export default function CombatPage() {
   }
 
   return (
-    <AppLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Sistema de Combate
-            </h1>
-            <p className="text-muted-foreground">
-              Gestiona encuentros de combate turn-based en una cuadrícula
-              táctica.
-            </p>
-          </div>
-
-          {currentCombat && (
-            <div className="flex items-center gap-2">
-              <Badge
-                variant={
-                  currentCombat.status === 'setup'
-                    ? 'secondary'
-                    : currentCombat.status === 'active'
-                      ? 'default'
-                      : currentCombat.status === 'paused'
-                        ? 'outline'
-                        : 'destructive'
-                }
-              >
-                {currentCombat.status === 'setup'
-                  ? 'Configuración'
-                  : currentCombat.status === 'active'
-                    ? 'En Curso'
-                    : currentCombat.status === 'paused'
-                      ? 'Pausado'
-                      : 'Terminado'}
-              </Badge>
-              {currentCombat.status === 'active' && (
-                <Badge variant="outline">
-                  Ronda {currentCombat.currentRound}
-                </Badge>
-              )}
-            </div>
-          )}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Sistema de Combate
+          </h1>
+          <p className="text-muted-foreground">
+            Gestiona encuentros de combate turn-based en una cuadrícula táctica.
+          </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="setup" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Configuración
-            </TabsTrigger>
-            <TabsTrigger
-              value="combat"
-              className="flex items-center gap-2"
-              disabled={!currentCombat || currentCombat.status === 'setup'}
+        {currentCombat && (
+          <div className="flex items-center gap-2">
+            <Badge
+              variant={
+                currentCombat.status === 'setup'
+                  ? 'secondary'
+                  : currentCombat.status === 'active'
+                    ? 'default'
+                    : currentCombat.status === 'paused'
+                      ? 'outline'
+                      : 'destructive'
+              }
             >
-              <Target className="h-4 w-4" />
-              Combate
-            </TabsTrigger>
-            <TabsTrigger
-              value="log"
-              className="flex items-center gap-2"
-              disabled={!currentCombat}
-            >
-              <MessageSquare className="h-4 w-4" />
-              Registro
-            </TabsTrigger>
-            <TabsTrigger
-              value="recap"
-              className="flex items-center gap-2"
-              disabled={!currentCombat || currentCombat.status !== 'ended'}
-            >
-              <BarChart3 className="h-4 w-4" />
-              Resumen
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="setup" className="mt-6">
-            <CombatSetup
-              characters={mockCharacters}
-              npcs={mockNPCs}
-              maps={mockMaps}
-              onStartCombat={handleStartCombat}
-            />
-          </TabsContent>
-
-          <TabsContent value="combat" className="mt-6">
-            {currentCombat && currentCombat.map ? (
-              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <div className="xl:col-span-2">
-                  <CombatGrid combat={currentCombat} map={currentCombat.map} />
-                </div>
-                <div>
-                  <CombatTurnManager combat={currentCombat} />
-                </div>
-              </div>
-            ) : (
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <Sword className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium mb-2">
-                      No hay combate activo
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      Configura un combate en la pestaña de Configuración para
-                      comenzar.
-                    </p>
-                    <Button onClick={() => setActiveTab('setup')}>
-                      <Settings className="h-4 w-4 mr-2" />
-                      Ir a Configuración
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              {currentCombat.status === 'setup'
+                ? 'Configuración'
+                : currentCombat.status === 'active'
+                  ? 'En Curso'
+                  : currentCombat.status === 'paused'
+                    ? 'Pausado'
+                    : 'Terminado'}
+            </Badge>
+            {currentCombat.status === 'active' && (
+              <Badge variant="outline">
+                Ronda {currentCombat.currentRound}
+              </Badge>
             )}
-          </TabsContent>
-
-          <TabsContent value="log" className="mt-6">
-            {currentCombat ? (
-              <div className="h-[600px]">
-                <CombatLog combatId={currentCombat.id} />
-              </div>
-            ) : (
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center py-8 text-muted-foreground">
-                    <MessageSquare className="h-16 w-16 mx-auto mb-4" />
-                    <p>No hay combate para mostrar el registro</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="recap" className="mt-6">
-            {currentCombat && currentCombat.status === 'ended' ? (
-              <CombatRecap combatId={currentCombat.id} />
-            ) : (
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center py-8 text-muted-foreground">
-                    <BarChart3 className="h-16 w-16 mx-auto mb-4" />
-                    <p>
-                      El resumen estará disponible cuando termine el combate
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
-    </AppLayout>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="setup" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Configuración
+          </TabsTrigger>
+          <TabsTrigger
+            value="combat"
+            className="flex items-center gap-2"
+            disabled={!currentCombat || currentCombat.status === 'setup'}
+          >
+            <Target className="h-4 w-4" />
+            Combate
+          </TabsTrigger>
+          <TabsTrigger
+            value="log"
+            className="flex items-center gap-2"
+            disabled={!currentCombat}
+          >
+            <MessageSquare className="h-4 w-4" />
+            Registro
+          </TabsTrigger>
+          <TabsTrigger
+            value="recap"
+            className="flex items-center gap-2"
+            disabled={!currentCombat || currentCombat.status !== 'ended'}
+          >
+            <BarChart3 className="h-4 w-4" />
+            Resumen
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="setup" className="mt-6">
+          <CombatSetup
+            characters={mockCharacters}
+            npcs={mockNPCs}
+            maps={mockMaps}
+            onStartCombat={handleStartCombat}
+          />
+        </TabsContent>
+
+        <TabsContent value="combat" className="mt-6">
+          {currentCombat && currentCombat.map ? (
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2">
+                <CombatGrid combat={currentCombat} map={currentCombat.map} />
+              </div>
+              <div>
+                <CombatTurnManager combat={currentCombat} />
+              </div>
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-8">
+                  <Sword className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">
+                    No hay combate activo
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Configura un combate en la pestaña de Configuración para
+                    comenzar.
+                  </p>
+                  <Button onClick={() => setActiveTab('setup')}>
+                    <Settings className="h-4 w-4 mr-2" />
+                    Ir a Configuración
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="log" className="mt-6">
+          {currentCombat ? (
+            <div className="h-[600px]">
+              <CombatLog combatId={currentCombat.id} />
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-8 text-muted-foreground">
+                  <MessageSquare className="h-16 w-16 mx-auto mb-4" />
+                  <p>No hay combate para mostrar el registro</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="recap" className="mt-6">
+          {currentCombat && currentCombat.status === 'ended' ? (
+            <CombatRecap combatId={currentCombat.id} />
+          ) : (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-8 text-muted-foreground">
+                  <BarChart3 className="h-16 w-16 mx-auto mb-4" />
+                  <p>El resumen estará disponible cuando termine el combate</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
   )
 }

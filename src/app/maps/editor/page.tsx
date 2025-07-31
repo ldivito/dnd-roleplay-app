@@ -8,7 +8,6 @@ import React, {
   Suspense,
 } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import AppLayout from '@/components/AppLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -485,356 +484,352 @@ function MapEditorContent() {
 
   if (!currentMap) {
     return (
-      <AppLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">
-              Cargando Editor de Mapas...
-            </h2>
-          </div>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">
+            Cargando Editor de Mapas...
+          </h2>
         </div>
-      </AppLayout>
+      </div>
     )
   }
 
   return (
-    <AppLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => router.back()}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                Editor de Mapas
-              </h1>
-              <p className="text-muted-foreground">
-                {location?.name} - {currentMap.name}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => setShowSettings(true)}>
-              <Settings className="h-4 w-4 mr-2" />
-              Configuración
-            </Button>
-            <Button onClick={handleSaveMap}>
-              <Save className="h-4 w-4 mr-2" />
-              Guardar Mapa
-            </Button>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Editor de Mapas
+            </h1>
+            <p className="text-muted-foreground">
+              {location?.name} - {currentMap.name}
+            </p>
           </div>
         </div>
 
-        {/* Map Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Grid3X3 className="h-5 w-5" />
-              {currentMap.name}
-              <Badge variant="outline">
-                {currentMap.width} × {currentMap.height}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {currentMap.description || 'Sin descripción'}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setShowSettings(true)}>
+            <Settings className="h-4 w-4 mr-2" />
+            Configuración
+          </Button>
+          <Button onClick={handleSaveMap}>
+            <Save className="h-4 w-4 mr-2" />
+            Guardar Mapa
+          </Button>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Tools Panel */}
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-4 w-4" />
-                  Herramientas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="terrain" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="terrain">Terreno</TabsTrigger>
-                    <TabsTrigger value="features">Elementos</TabsTrigger>
-                    <TabsTrigger value="utils">Utilidades</TabsTrigger>
-                  </TabsList>
+      {/* Map Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Grid3X3 className="h-5 w-5" />
+            {currentMap.name}
+            <Badge variant="outline">
+              {currentMap.width} × {currentMap.height}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            {currentMap.description || 'Sin descripción'}
+          </p>
+        </CardContent>
+      </Card>
 
-                  <TabsContent value="terrain" className="space-y-2">
-                    <ScrollArea className="h-64">
-                      <div className="grid grid-cols-2 gap-2">
-                        {MAP_EDITOR_TOOLS.filter(
-                          tool => tool.type === 'terrain'
-                        ).map(tool => (
-                          <Button
-                            key={tool.id}
-                            variant={
-                              selectedTool === tool.id ? 'default' : 'outline'
-                            }
-                            size="sm"
-                            className="h-12 flex flex-col gap-1"
-                            onClick={() => setSelectedTool(tool.id)}
-                            title={tool.description}
-                          >
-                            <span className="text-lg">{tool.icon}</span>
-                            <span className="text-xs">{tool.name}</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </TabsContent>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Tools Panel */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-4 w-4" />
+                Herramientas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="terrain" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="terrain">Terreno</TabsTrigger>
+                  <TabsTrigger value="features">Elementos</TabsTrigger>
+                  <TabsTrigger value="utils">Utilidades</TabsTrigger>
+                </TabsList>
 
-                  <TabsContent value="features" className="space-y-2">
-                    <ScrollArea className="h-64">
-                      <div className="grid grid-cols-2 gap-2">
-                        {MAP_EDITOR_TOOLS.filter(
-                          tool => tool.type === 'feature'
-                        ).map(tool => (
-                          <Button
-                            key={tool.id}
-                            variant={
-                              selectedTool === tool.id ? 'default' : 'outline'
-                            }
-                            size="sm"
-                            className="h-12 flex flex-col gap-1"
-                            onClick={() => setSelectedTool(tool.id)}
-                            title={tool.description}
-                          >
-                            <span className="text-lg">{tool.icon}</span>
-                            <span className="text-xs">{tool.name}</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </TabsContent>
-
-                  <TabsContent value="utils" className="space-y-2">
-                    <div className="grid grid-cols-1 gap-2">
+                <TabsContent value="terrain" className="space-y-2">
+                  <ScrollArea className="h-64">
+                    <div className="grid grid-cols-2 gap-2">
                       {MAP_EDITOR_TOOLS.filter(
-                        tool => tool.type === 'utility'
+                        tool => tool.type === 'terrain'
                       ).map(tool => (
                         <Button
                           key={tool.id}
                           variant={
                             selectedTool === tool.id ? 'default' : 'outline'
                           }
+                          size="sm"
+                          className="h-12 flex flex-col gap-1"
                           onClick={() => setSelectedTool(tool.id)}
                           title={tool.description}
                         >
-                          {tool.icon} {tool.name}
+                          <span className="text-lg">{tool.icon}</span>
+                          <span className="text-xs">{tool.name}</span>
                         </Button>
                       ))}
                     </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
+                  </ScrollArea>
+                </TabsContent>
 
-            {/* Brush Controls */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-4 w-4" />
-                  Pincel
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label>Tamaño del pincel</Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Button
-                      variant={brushSize === 1 ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setBrushSize(1)}
-                    >
-                      1x1
-                    </Button>
-                    <Button
-                      variant={brushSize === 2 ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setBrushSize(2)}
-                    >
-                      2x2
-                    </Button>
-                    <Button
-                      variant={brushSize === 3 ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setBrushSize(3)}
-                    >
-                      3x3
-                    </Button>
+                <TabsContent value="features" className="space-y-2">
+                  <ScrollArea className="h-64">
+                    <div className="grid grid-cols-2 gap-2">
+                      {MAP_EDITOR_TOOLS.filter(
+                        tool => tool.type === 'feature'
+                      ).map(tool => (
+                        <Button
+                          key={tool.id}
+                          variant={
+                            selectedTool === tool.id ? 'default' : 'outline'
+                          }
+                          size="sm"
+                          className="h-12 flex flex-col gap-1"
+                          onClick={() => setSelectedTool(tool.id)}
+                          title={tool.description}
+                        >
+                          <span className="text-lg">{tool.icon}</span>
+                          <span className="text-xs">{tool.name}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="utils" className="space-y-2">
+                  <div className="grid grid-cols-1 gap-2">
+                    {MAP_EDITOR_TOOLS.filter(
+                      tool => tool.type === 'utility'
+                    ).map(tool => (
+                      <Button
+                        key={tool.id}
+                        variant={
+                          selectedTool === tool.id ? 'default' : 'outline'
+                        }
+                        onClick={() => setSelectedTool(tool.id)}
+                        title={tool.description}
+                      >
+                        {tool.icon} {tool.name}
+                      </Button>
+                    ))}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
 
-            {/* View Controls */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  Vista
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label>Mostrar cuadrícula</Label>
+          {/* Brush Controls */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-4 w-4" />
+                Pincel
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Tamaño del pincel</Label>
+                <div className="flex items-center gap-2 mt-2">
                   <Button
-                    variant="ghost"
+                    variant={brushSize === 1 ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setShowGrid(!showGrid)}
+                    onClick={() => setBrushSize(1)}
                   >
-                    {showGrid ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
-                    )}
+                    1x1
+                  </Button>
+                  <Button
+                    variant={brushSize === 2 ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setBrushSize(2)}
+                  >
+                    2x2
+                  </Button>
+                  <Button
+                    variant={brushSize === 3 ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setBrushSize(3)}
+                  >
+                    3x3
                   </Button>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="flex items-center justify-between">
-                  <Label>Coordenadas</Label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowCoordinates(!showCoordinates)}
-                  >
-                    {showCoordinates ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {/* View Controls */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-4 w-4" />
+                Vista
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Mostrar cuadrícula</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowGrid(!showGrid)}
+                >
+                  {showGrid ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
 
-          {/* Canvas */}
-          <div className="lg:col-span-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Lienzo del Mapa</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="w-full h-[600px] border rounded-lg">
-                  <canvas
-                    ref={canvasRef}
-                    width={canvasSize.width}
-                    height={canvasSize.height}
-                    className="cursor-crosshair"
-                    onMouseDown={handleCanvasMouseDown}
-                    onMouseMove={handleCanvasMouseMove}
-                    onMouseUp={handleCanvasMouseUp}
-                    onMouseLeave={handleCanvasMouseLeave}
-                    style={{ imageRendering: 'pixelated' }}
-                  />
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </div>
+              <div className="flex items-center justify-between">
+                <Label>Coordenadas</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowCoordinates(!showCoordinates)}
+                >
+                  {showCoordinates ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Map Settings Dialog */}
-        <Dialog open={showSettings} onOpenChange={setShowSettings}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Configuración del Mapa</DialogTitle>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div>
-                <Label>Nombre del Mapa</Label>
-                <Input
-                  value={currentMap.name}
-                  onChange={e =>
-                    setCurrentMap({
-                      ...currentMap,
-                      name: e.target.value,
-                    })
-                  }
+        {/* Canvas */}
+        <div className="lg:col-span-3">
+          <Card>
+            <CardHeader>
+              <CardTitle>Lienzo del Mapa</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="w-full h-[600px] border rounded-lg">
+                <canvas
+                  ref={canvasRef}
+                  width={canvasSize.width}
+                  height={canvasSize.height}
+                  className="cursor-crosshair"
+                  onMouseDown={handleCanvasMouseDown}
+                  onMouseMove={handleCanvasMouseMove}
+                  onMouseUp={handleCanvasMouseUp}
+                  onMouseLeave={handleCanvasMouseLeave}
+                  style={{ imageRendering: 'pixelated' }}
                 />
-              </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
-              <div>
-                <Label>Descripción</Label>
-                <Textarea
-                  value={currentMap.description || ''}
-                  onChange={e =>
-                    setCurrentMap({
-                      ...currentMap,
-                      description: e.target.value,
-                    })
-                  }
-                />
-              </div>
+      {/* Map Settings Dialog */}
+      <Dialog open={showSettings} onOpenChange={setShowSettings}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Configuración del Mapa</DialogTitle>
+          </DialogHeader>
 
-              <Separator />
+          <div className="space-y-4">
+            <div>
+              <Label>Nombre del Mapa</Label>
+              <Input
+                value={currentMap.name}
+                onChange={e =>
+                  setCurrentMap({
+                    ...currentMap,
+                    name: e.target.value,
+                  })
+                }
+              />
+            </div>
 
-              <div>
-                <Label>Tamaño del Mapa</Label>
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  {MAP_SIZE_PRESETS.slice(0, 6).map(preset => (
-                    <Button
-                      key={preset.name}
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        handleNewMapSize(preset.width, preset.height)
-                      }
-                    >
-                      {preset.name}
-                      <br />
-                      <span className="text-xs">
-                        {preset.width}×{preset.height}
-                      </span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
+            <div>
+              <Label>Descripción</Label>
+              <Textarea
+                value={currentMap.description || ''}
+                onChange={e =>
+                  setCurrentMap({
+                    ...currentMap,
+                    description: e.target.value,
+                  })
+                }
+              />
+            </div>
 
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <Label>Ancho</Label>
-                  <Input
-                    type="number"
-                    min="5"
-                    max="50"
-                    value={currentMap.width}
-                    onChange={e =>
-                      handleNewMapSize(
-                        parseInt(e.target.value) || currentMap.width,
-                        currentMap.height
-                      )
+            <Separator />
+
+            <div>
+              <Label>Tamaño del Mapa</Label>
+              <div className="grid grid-cols-3 gap-2 mt-2">
+                {MAP_SIZE_PRESETS.slice(0, 6).map(preset => (
+                  <Button
+                    key={preset.name}
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handleNewMapSize(preset.width, preset.height)
                     }
-                  />
-                </div>
-                <div className="flex-1">
-                  <Label>Alto</Label>
-                  <Input
-                    type="number"
-                    min="5"
-                    max="50"
-                    value={currentMap.height}
-                    onChange={e =>
-                      handleNewMapSize(
-                        currentMap.width,
-                        parseInt(e.target.value) || currentMap.height
-                      )
-                    }
-                  />
-                </div>
+                  >
+                    {preset.name}
+                    <br />
+                    <span className="text-xs">
+                      {preset.width}×{preset.height}
+                    </span>
+                  </Button>
+                ))}
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </AppLayout>
+
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <Label>Ancho</Label>
+                <Input
+                  type="number"
+                  min="5"
+                  max="50"
+                  value={currentMap.width}
+                  onChange={e =>
+                    handleNewMapSize(
+                      parseInt(e.target.value) || currentMap.width,
+                      currentMap.height
+                    )
+                  }
+                />
+              </div>
+              <div className="flex-1">
+                <Label>Alto</Label>
+                <Input
+                  type="number"
+                  min="5"
+                  max="50"
+                  value={currentMap.height}
+                  onChange={e =>
+                    handleNewMapSize(
+                      currentMap.width,
+                      parseInt(e.target.value) || currentMap.height
+                    )
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   )
 }
 
@@ -842,15 +837,13 @@ export default function MapEditorPage() {
   return (
     <Suspense
       fallback={
-        <AppLayout>
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-4">
-                Cargando Editor de Mapas...
-              </h2>
-            </div>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">
+              Cargando Editor de Mapas...
+            </h2>
           </div>
-        </AppLayout>
+        </div>
       }
     >
       <MapEditorContent />
