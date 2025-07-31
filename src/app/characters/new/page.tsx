@@ -4,7 +4,6 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { v4 as uuidv4 } from 'uuid'
 import AppLayout from '@/components/AppLayout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -44,7 +43,7 @@ export default function NewCharacterPage() {
 
   const form = useForm<CharacterFormData>({
     defaultValues: {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       name: '',
       class: '',
       level: 1,

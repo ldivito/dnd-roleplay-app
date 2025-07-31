@@ -143,10 +143,10 @@ describe('Quest System', () => {
     it('should calculate progress correctly with no completed actions', () => {
       const progress = calculateQuestProgress(sampleQuest)
 
-      expect(progress.completedActions).toBe(0)
-      expect(progress.totalActions).toBe(4)
-      expect(progress.progressPercentage).toBe(0)
-      expect(progress.nextAction?.id).toBe('action-1')
+      expect(progress?.completedActions).toBe(0)
+      expect(progress?.totalActions).toBe(4)
+      expect(progress?.progressPercentage).toBe(0)
+      expect(progress?.nextAction?.id).toBe('action-1')
     })
 
     it('should calculate progress correctly with some completed actions', () => {
@@ -160,10 +160,10 @@ describe('Quest System', () => {
 
       const progress = calculateQuestProgress(questWithProgress)
 
-      expect(progress.completedActions).toBe(2)
-      expect(progress.totalActions).toBe(4)
-      expect(progress.progressPercentage).toBe(50)
-      expect(progress.nextAction?.id).toBe('action-3')
+      expect(progress?.completedActions).toBe(2)
+      expect(progress?.totalActions).toBe(4)
+      expect(progress?.progressPercentage).toBe(50)
+      expect(progress?.nextAction?.id).toBe('action-3')
     })
 
     it('should calculate progress correctly with all actions completed', () => {
@@ -177,21 +177,21 @@ describe('Quest System', () => {
 
       const progress = calculateQuestProgress(completedQuest)
 
-      expect(progress.completedActions).toBe(4)
-      expect(progress.totalActions).toBe(4)
-      expect(progress.progressPercentage).toBe(100)
-      expect(progress.nextAction).toBeUndefined()
+      expect(progress?.completedActions).toBe(4)
+      expect(progress?.totalActions).toBe(4)
+      expect(progress?.progressPercentage).toBe(100)
+      expect(progress?.nextAction).toBeUndefined()
     })
   })
 
   describe('Action Prerequisites', () => {
     it('should allow starting first action with no prerequisites', () => {
-      const canStart = canStartAction(sampleActions[0], sampleActions)
+      const canStart = canStartAction(sampleActions[0]!, sampleActions)
       expect(canStart).toBe(true)
     })
 
     it('should not allow starting action with unfulfilled prerequisites', () => {
-      const canStart = canStartAction(sampleActions[1], sampleActions)
+      const canStart = canStartAction(sampleActions[1]!, sampleActions)
       expect(canStart).toBe(false)
     })
 
@@ -208,7 +208,7 @@ describe('Quest System', () => {
     })
 
     it('should not allow starting completed action', () => {
-      const completedAction = { ...sampleActions[0], isCompleted: true }
+      const completedAction = { ...sampleActions[0]!, isCompleted: true }
       const canStart = canStartAction(completedAction, sampleActions)
       expect(canStart).toBe(false)
     })
@@ -219,28 +219,28 @@ describe('Quest System', () => {
       const timeline = generateQuestTimeline(sampleQuest)
 
       expect(timeline).toHaveLength(4)
-      expect(timeline[0].id).toBe('action-1')
-      expect(timeline[1].id).toBe('action-2')
-      expect(timeline[2].id).toBe('action-3')
-      expect(timeline[3].id).toBe('action-4')
+      expect(timeline[0]?.id).toBe('action-1')
+      expect(timeline[1]?.id).toBe('action-2')
+      expect(timeline[2]?.id).toBe('action-3')
+      expect(timeline[3]?.id).toBe('action-4')
     })
 
     it('should mark first action as startable', () => {
       const timeline = generateQuestTimeline(sampleQuest)
 
-      expect(timeline[0].canStart).toBe(true)
-      expect(timeline[1].canStart).toBe(false)
-      expect(timeline[2].canStart).toBe(false)
-      expect(timeline[3].canStart).toBe(false)
+      expect(timeline[0]?.canStart).toBe(true)
+      expect(timeline[1]?.canStart).toBe(false)
+      expect(timeline[2]?.canStart).toBe(false)
+      expect(timeline[3]?.canStart).toBe(false)
     })
 
     it('should correctly identify dependencies', () => {
       const timeline = generateQuestTimeline(sampleQuest)
 
-      expect(timeline[0].dependencies).toEqual([])
-      expect(timeline[1].dependencies).toEqual(['Talk to Village Elder'])
-      expect(timeline[2].dependencies).toEqual(['Find the Old Map'])
-      expect(timeline[3].dependencies).toEqual(['Visit the Ruins'])
+      expect(timeline[0]?.dependencies).toEqual([])
+      expect(timeline[1]?.dependencies).toEqual(['Talk to Village Elder'])
+      expect(timeline[2]?.dependencies).toEqual(['Find the Old Map'])
+      expect(timeline[3]?.dependencies).toEqual(['Visit the Ruins'])
     })
   })
 
@@ -282,22 +282,22 @@ describe('Quest System', () => {
     it('should get completed quests', () => {
       const completedQuests = getCompletedQuests(questList)
       expect(completedQuests).toHaveLength(1)
-      expect(completedQuests[0].status).toBe('completed')
+      expect(completedQuests[0]?.status).toBe('completed')
     })
 
     it('should sort quests by priority correctly', () => {
       const sortedQuests = sortQuestsByPriority(questList)
 
       // High priority quests should come first
-      expect(sortedQuests[0].priority).toBe('high')
-      expect(sortedQuests[1].priority).toBe('high')
+      expect(sortedQuests[0]?.priority).toBe('high')
+      expect(sortedQuests[1]?.priority).toBe('high')
 
       // Then medium priority
-      expect(sortedQuests[2].priority).toBe('medium')
-      expect(sortedQuests[3].priority).toBe('medium')
+      expect(sortedQuests[2]?.priority).toBe('medium')
+      expect(sortedQuests[3]?.priority).toBe('medium')
 
       // Finally low priority
-      expect(sortedQuests[4].priority).toBe('low')
+      expect(sortedQuests[4]?.priority).toBe('low')
     })
   })
 
@@ -307,8 +307,8 @@ describe('Quest System', () => {
         c => c.type === 'npc'
       )
       expect(npcConnections).toHaveLength(1)
-      expect(npcConnections[0].entityName).toBe('Elder Marcus')
-      expect(npcConnections[0].relationshipType).toBe('questgiver')
+      expect(npcConnections[0]?.entityName).toBe('Elder Marcus')
+      expect(npcConnections[0]?.relationshipType).toBe('questgiver')
     })
 
     it('should handle NPC references in actions', () => {

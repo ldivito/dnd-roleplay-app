@@ -376,8 +376,8 @@ describe('Quest Components', () => {
       const mixedQuest = {
         ...sampleQuest,
         actions: [
-          { ...sampleActions[0], isCompleted: true },
-          { ...sampleActions[1], isCompleted: false },
+          { ...sampleActions[0]!, isCompleted: true },
+          { ...sampleActions[1]!, isCompleted: false },
         ],
       }
 

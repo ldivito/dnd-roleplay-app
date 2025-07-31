@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createIndexedDBPersist, PersistState } from '@/lib/indexedDBPersist'
 import type { Session, Campaign } from '@/types/session'
 import type { Character } from '@/types/character'
 import type { DiceRoll, Initiative } from '@/types/dice'
@@ -11,8 +11,9 @@ import { DEFAULT_ERAS } from '@/types/lore'
 import type { NPC } from '@/types/npc'
 import type { Quest } from '@/types/quest'
 import type { Faction } from '@/types/faction'
+import type { LocationMap } from '@/types/map'
 
-interface SessionState {
+interface SessionState extends PersistState {
   currentSession: Session | null
   currentCampaign: Campaign | null
   characters: Character[]
@@ -26,6 +27,7 @@ interface SessionState {
   npcs: NPC[]
   quests: Quest[]
   factions: Faction[]
+  maps: LocationMap[]
 
   // Actions
   createSession: (
@@ -90,14 +92,22 @@ interface SessionState {
   getActiveFactions: () => Faction[]
   getFactionsByInfluence: (influence: string) => Faction[]
 
+  addMap: (map: LocationMap) => void
+  updateMap: (mapId: string, updates: Partial<LocationMap>) => void
+  removeMap: (mapId: string) => void
+  getMapsByLocation: (locationId: string) => LocationMap[]
+  getMapById: (mapId: string) => LocationMap | undefined
+
   setInitiatives: (initiatives: Initiative[]) => void
   addDiceRoll: (roll: DiceRoll) => void
   clearDiceHistory: () => void
 }
 
 export const useSessionStore = create<SessionState>()(
-  persist(
+  createIndexedDBPersist(
     (set, get) => ({
+      hasHydrated: false,
+      setHasHydrated: (state: boolean) => set({ hasHydrated: state }),
       currentSession: null,
       currentCampaign: null,
       characters: [],
@@ -111,6 +121,7 @@ export const useSessionStore = create<SessionState>()(
       npcs: [],
       quests: [],
       factions: [],
+      maps: [],
 
       createSession: sessionData => {
         const session: Session = {
@@ -531,6 +542,54 @@ export const useSessionStore = create<SessionState>()(
         return factions.filter(faction => faction.influence === influence)
       },
 
+      addMap: map => {
+        const { maps } = get()
+        const newMap = {
+          ...map,
+          metadata: {
+            ...map.metadata,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            version: 1,
+          },
+        }
+        set({ maps: [...maps, newMap] })
+      },
+
+      updateMap: (mapId, updates) => {
+        const { maps } = get()
+        const updatedMaps = maps.map(map =>
+          map.id === mapId
+            ? {
+                ...map,
+                ...updates,
+                metadata: {
+                  ...map.metadata,
+                  ...updates.metadata,
+                  updatedAt: new Date(),
+                  version: (map.metadata.version || 1) + 1,
+                },
+              }
+            : map
+        )
+        set({ maps: updatedMaps })
+      },
+
+      removeMap: mapId => {
+        const { maps } = get()
+        set({ maps: maps.filter(map => map.id !== mapId) })
+      },
+
+      getMapsByLocation: locationId => {
+        const { maps } = get()
+        return maps.filter(map => map.locationId === locationId)
+      },
+
+      getMapById: mapId => {
+        const { maps } = get()
+        return maps.find(map => map.id === mapId)
+      },
+
       setInitiatives: initiatives => {
         set({ initiatives })
       },
@@ -547,58 +606,9 @@ export const useSessionStore = create<SessionState>()(
     }),
     {
       name: 'dnd-session-storage',
-      partialize: state => ({
-        currentSession: state.currentSession,
-        currentCampaign: state.currentCampaign,
-        characters: state.characters,
-        spells: state.spells,
-        items: state.items,
-        locations: state.locations,
-        lore: state.lore,
-        eras: state.eras,
-        npcs: state.npcs,
-        quests: state.quests,
-        factions: state.factions,
-        diceHistory: state.diceHistory,
-      }),
-      onRehydrateStorage: () => state => {
-        if (state?.quests) {
-          state.quests = state.quests.map(quest => ({
-            ...quest,
-            createdAt: new Date(quest.createdAt),
-            updatedAt: new Date(quest.updatedAt),
-            lastUpdated: new Date(quest.lastUpdated),
-            ...(quest.startDate && { startDate: new Date(quest.startDate) }),
-            ...(quest.completedDate && {
-              completedDate: new Date(quest.completedDate),
-            }),
-            actions: quest.actions.map(action => ({
-              ...action,
-              ...(action.completedAt && {
-                completedAt: new Date(action.completedAt),
-              }),
-            })),
-          }))
-        }
-
-        if (state?.factions) {
-          state.factions = state.factions.map(faction => ({
-            ...faction,
-            createdAt: new Date(faction.createdAt),
-            updatedAt: new Date(faction.updatedAt),
-            ...(faction.foundedDate && {
-              foundedDate: new Date(faction.foundedDate),
-            }),
-            goals: faction.goals.map(goal => ({
-              ...goal,
-              ...(goal.deadline && { deadline: new Date(goal.deadline) }),
-            })),
-            relationships: faction.relationships.map(rel => ({
-              ...rel,
-              lastUpdated: new Date(rel.lastUpdated),
-            })),
-          }))
-        }
+      version: '1.0.0',
+      onRehydrateStorage: () => {
+        console.log('Session store rehydrated from IndexedDB')
       },
     }
   )
