@@ -162,44 +162,44 @@ export function EventDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            {existingEvent ? 'Edit Event' : 'Create New Event'}
+            {existingEvent ? 'Editar Evento' : 'Crear Nuevo Evento'}
           </DialogTitle>
           <DialogDescription>
             {existingEvent
-              ? 'Update the details of this calendar event.'
-              : 'Add a new event to your calendar system.'}
+              ? 'Actualiza los detalles de este evento del calendario.'
+              : 'Agrega un nuevo evento a tu sistema de calendario.'}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="title">Event Title *</Label>
+              <Label htmlFor="title">Título del Evento *</Label>
               <Input
                 id="title"
                 value={event.title || ''}
                 onChange={e =>
                   setEvent(prev => ({ ...prev, title: e.target.value }))
                 }
-                placeholder="e.g., Midsummer Festival, The Feast of the Moon"
+                placeholder="ej., Festival de Verano, La Fiesta de la Luna"
               />
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Descripción</Label>
               <Textarea
                 id="description"
                 value={event.description || ''}
                 onChange={e =>
                   setEvent(prev => ({ ...prev, description: e.target.value }))
                 }
-                placeholder="Optional description of the event..."
+                placeholder="Descripción opcional del evento..."
                 rows={3}
               />
             </div>
 
             <div>
-              <Label htmlFor="type">Event Type</Label>
+              <Label htmlFor="type">Tipo de Evento</Label>
               <Select
                 value={event.type || 'festival'}
                 onValueChange={handleTypeChange}
@@ -227,12 +227,12 @@ export function EventDialog({
           <div className="space-y-4">
             <h3 className="text-lg font-medium flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Date & Time
+              Fecha y Hora
             </h3>
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="month">Month</Label>
+                <Label htmlFor="month">Mes</Label>
                 <Select
                   value={event.month?.toString() || '1'}
                   onValueChange={value =>
@@ -256,7 +256,7 @@ export function EventDialog({
               </div>
 
               <div>
-                <Label htmlFor="day">Day</Label>
+                <Label htmlFor="day">Día</Label>
                 <Input
                   id="day"
                   type="number"
@@ -273,7 +273,7 @@ export function EventDialog({
               </div>
 
               <div>
-                <Label htmlFor="duration">Duration (Days)</Label>
+                <Label htmlFor="duration">Duración (Días)</Label>
                 <Input
                   id="duration"
                   type="number"
@@ -298,13 +298,13 @@ export function EventDialog({
                 }
               />
               <Label htmlFor="isRecurring">
-                Recurring Event (happens every year)
+                Evento Recurrente (ocurre cada año)
               </Label>
             </div>
 
             {!event.isRecurring && (
               <div>
-                <Label htmlFor="year">Year</Label>
+                <Label htmlFor="year">Año</Label>
                 <Input
                   id="year"
                   type="number"
@@ -322,7 +322,7 @@ export function EventDialog({
           </div>
 
           <div>
-            <Label>Event Color</Label>
+            <Label>Color del Evento</Label>
             <div className="flex gap-2 mt-2">
               {EVENT_TYPES.map(type => (
                 <button
@@ -351,24 +351,25 @@ export function EventDialog({
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm">
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Event
+                    Eliminar Evento
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Event</AlertDialogTitle>
+                    <AlertDialogTitle>Eliminar Evento</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete &quot;
-                      {existingEvent.title}&quot;? This action cannot be undone.
+                      ¿Estás seguro de que quieres eliminar &quot;
+                      {existingEvent.title}&quot;? Esta acción no se puede
+                      deshacer.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDelete}
                       className="bg-destructive hover:bg-destructive/90"
                     >
-                      Delete
+                      Eliminar
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -378,13 +379,13 @@ export function EventDialog({
 
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Cancelar
             </Button>
             <Button
               onClick={handleSave}
               disabled={!event.title || !event.day || !event.month}
             >
-              {existingEvent ? 'Update Event' : 'Create Event'}
+              {existingEvent ? 'Actualizar Evento' : 'Crear Evento'}
             </Button>
           </div>
         </DialogFooter>

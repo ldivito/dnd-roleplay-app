@@ -143,29 +143,30 @@ export default function CalendarPage() {
       <div className="container mx-auto p-6">
         <div className="flex items-center gap-3 mb-8">
           <CalendarIcon className="h-8 w-8" />
-          <h1 className="text-3xl font-bold">Calendar System</h1>
+          <h1 className="text-3xl font-bold">Sistema de Calendario</h1>
         </div>
 
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle>Welcome to your Campaign Calendar</CardTitle>
+            <CardTitle>Bienvenido a tu Calendario de Campaña</CardTitle>
             <CardDescription>
-              Create a custom calendar system for your world, including seasons,
-              events, and festivals.
+              Crea un sistema de calendario personalizado para tu mundo,
+              incluyendo estaciones, eventos y festivales.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Start by configuring your calendar system. You can choose from
-                preset calendars or create your own custom configuration.
+                Comienza configurando tu sistema de calendario. Puedes elegir
+                entre calendarios predefinidos o crear tu propia configuración
+                personalizada.
               </p>
               <Button
                 onClick={() => setConfigDialogOpen(true)}
                 className="w-full"
               >
                 <Settings className="h-4 w-4 mr-2" />
-                Configure Calendar System
+                Configurar Sistema de Calendario
               </Button>
             </div>
           </CardContent>
@@ -211,11 +212,11 @@ export default function CalendarPage() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setConfigDialogOpen(true)}>
             <Settings className="h-4 w-4 mr-2" />
-            Settings
+            Configuración
           </Button>
           <Button onClick={() => openEventDialog()}>
             <Plus className="h-4 w-4 mr-2" />
-            Add Event
+            Agregar Evento
           </Button>
         </div>
       </div>
@@ -229,7 +230,7 @@ export default function CalendarPage() {
                 style={{ backgroundColor: currentSeason.color }}
               />
               <CardTitle className="text-lg">
-                Current Season: {currentSeason.name}
+                Estación Actual: {currentSeason.name}
               </CardTitle>
             </div>
             {currentSeason.description && (
@@ -320,7 +321,7 @@ export default function CalendarPage() {
                     ))}
                     {events.length > 2 && (
                       <div className="text-xs text-muted-foreground">
-                        +{events.length - 2} more
+                        +{events.length - 2} más
                       </div>
                     )}
                   </div>
@@ -334,7 +335,7 @@ export default function CalendarPage() {
       {calendarData.events.length > 0 && (
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Upcoming Events</CardTitle>
+            <CardTitle>Próximos Eventos</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -366,7 +367,7 @@ export default function CalendarPage() {
                         )}
                         {event.isRecurring && (
                           <Badge variant="secondary" className="ml-2">
-                            Recurring
+                            Recurrente
                           </Badge>
                         )}
                       </div>

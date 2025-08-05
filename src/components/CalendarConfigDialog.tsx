@@ -206,36 +206,40 @@ export function CalendarConfigDialog({
         <DialogHeader>
           <DialogTitle>
             {existingConfig
-              ? 'Edit Calendar Configuration'
-              : 'Create Calendar System'}
+              ? 'Editar Configuración del Calendario'
+              : 'Crear Sistema de Calendario'}
           </DialogTitle>
           <DialogDescription>
-            Configure your world&apos;s calendar system, including time
-            structure, naming, and seasons.
+            Configura el sistema de calendario de tu mundo, incluyendo
+            estructura de tiempo, nombres y estaciones.
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="basic" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="basic">Basic Setup</TabsTrigger>
-            <TabsTrigger value="time">Time Structure</TabsTrigger>
-            <TabsTrigger value="naming">Names & Labels</TabsTrigger>
-            <TabsTrigger value="seasons">Seasons</TabsTrigger>
+            <TabsTrigger value="basic">Configuración Básica</TabsTrigger>
+            <TabsTrigger value="time">Estructura de Tiempo</TabsTrigger>
+            <TabsTrigger value="naming">Nombres y Etiquetas</TabsTrigger>
+            <TabsTrigger value="seasons">Estaciones</TabsTrigger>
           </TabsList>
 
           <TabsContent value="basic" className="space-y-4">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="preset">Start with a Preset (Optional)</Label>
+                <Label htmlFor="preset">
+                  Comenzar con una Plantilla (Opcional)
+                </Label>
                 <Select
                   value={selectedPreset}
                   onValueChange={handlePresetSelect}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Choose a preset calendar or create custom" />
+                    <SelectValue placeholder="Elige un calendario predefinido o crea uno personalizado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="custom">Custom Calendar</SelectItem>
+                    <SelectItem value="custom">
+                      Calendario Personalizado
+                    </SelectItem>
                     {PRESET_CALENDARS.map(preset => (
                       <SelectItem key={preset.name} value={preset.name}>
                         {preset.name}
@@ -246,20 +250,20 @@ export function CalendarConfigDialog({
               </div>
 
               <div>
-                <Label htmlFor="name">Calendar Name *</Label>
+                <Label htmlFor="name">Nombre del Calendario *</Label>
                 <Input
                   id="name"
                   value={config.name || ''}
                   onChange={e =>
                     setConfig(prev => ({ ...prev, name: e.target.value }))
                   }
-                  placeholder="e.g., Harptos Calendar, World Calendar"
+                  placeholder="ej., Calendario Harptos, Calendario del Mundo"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="currentYear">Current Year</Label>
+                  <Label htmlFor="currentYear">Año Actual</Label>
                   <Input
                     id="currentYear"
                     type="number"
@@ -273,7 +277,7 @@ export function CalendarConfigDialog({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="currentMonth">Current Month</Label>
+                  <Label htmlFor="currentMonth">Mes Actual</Label>
                   <Input
                     id="currentMonth"
                     type="number"
@@ -291,7 +295,7 @@ export function CalendarConfigDialog({
               </div>
 
               <div>
-                <Label htmlFor="currentDay">Current Day</Label>
+                <Label htmlFor="currentDay">Día Actual</Label>
                 <Input
                   id="currentDay"
                   type="number"
@@ -311,7 +315,7 @@ export function CalendarConfigDialog({
           <TabsContent value="time" className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="daysPerYear">Days per Year</Label>
+                <Label htmlFor="daysPerYear">Días por Año</Label>
                 <Input
                   id="daysPerYear"
                   type="number"
@@ -325,7 +329,7 @@ export function CalendarConfigDialog({
                 />
               </div>
               <div>
-                <Label htmlFor="hoursPerDay">Hours per Day</Label>
+                <Label htmlFor="hoursPerDay">Horas por Día</Label>
                 <Input
                   id="hoursPerDay"
                   type="number"
@@ -342,7 +346,7 @@ export function CalendarConfigDialog({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="daysPerWeek">Days per Week</Label>
+                <Label htmlFor="daysPerWeek">Días por Semana</Label>
                 <Input
                   id="daysPerWeek"
                   type="number"
@@ -356,7 +360,7 @@ export function CalendarConfigDialog({
                 />
               </div>
               <div>
-                <Label htmlFor="monthsPerYear">Months per Year</Label>
+                <Label htmlFor="monthsPerYear">Meses por Año</Label>
                 <Input
                   id="monthsPerYear"
                   type="number"
@@ -375,66 +379,69 @@ export function CalendarConfigDialog({
           <TabsContent value="naming" className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="yearPrefix">Year Prefix</Label>
+                <Label htmlFor="yearPrefix">Prefijo de Año</Label>
                 <Input
                   id="yearPrefix"
                   value={config.yearPrefix || ''}
                   onChange={e =>
                     setConfig(prev => ({ ...prev, yearPrefix: e.target.value }))
                   }
-                  placeholder="e.g., Year, DR, AC"
+                  placeholder="ej., Año, DR, AC"
                 />
               </div>
               <div>
-                <Label htmlFor="yearSuffix">Year Suffix</Label>
+                <Label htmlFor="yearSuffix">Sufijo de Año</Label>
                 <Input
                   id="yearSuffix"
                   value={config.yearSuffix || ''}
                   onChange={e =>
                     setConfig(prev => ({ ...prev, yearSuffix: e.target.value }))
                   }
-                  placeholder="e.g., CE, AD"
+                  placeholder="ej., EC, dC"
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="dayNames">Day Names (comma-separated) *</Label>
+              <Label htmlFor="dayNames">
+                Nombres de Días (separados por comas) *
+              </Label>
               <Textarea
                 id="dayNames"
                 value={config.dayNames?.join(', ') || ''}
                 onChange={e => updateDayNames(e.target.value)}
-                placeholder="e.g., Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday"
+                placeholder="ej., Domingo, Lunes, Martes, Miércoles, Jueves, Viernes, Sábado"
                 rows={2}
               />
               <p className="text-sm text-muted-foreground mt-1">
-                Number of days will automatically set days per week
+                El número de días establecerá automáticamente los días por
+                semana
               </p>
             </div>
 
             <div>
               <Label htmlFor="monthNames">
-                Month Names (comma-separated) *
+                Nombres de Meses (separados por comas) *
               </Label>
               <Textarea
                 id="monthNames"
                 value={config.monthNames?.join(', ') || ''}
                 onChange={e => updateMonthNames(e.target.value)}
-                placeholder="e.g., January, February, March, April, May, June, July, August, September, October, November, December"
+                placeholder="ej., Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre, Octubre, Noviembre, Diciembre"
                 rows={3}
               />
               <p className="text-sm text-muted-foreground mt-1">
-                Number of months will automatically set months per year
+                El número de meses establecerá automáticamente los meses por año
               </p>
             </div>
           </TabsContent>
 
           <TabsContent value="seasons" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium">Seasons</h3>
+              <h3 className="text-lg font-medium">Estaciones</h3>
               <Button onClick={addSeason} size="sm">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Season
+                Agregar Estación
               </Button>
             </div>
 
@@ -450,8 +457,8 @@ export function CalendarConfigDialog({
                       <div>
                         <h4 className="font-medium">{season.name}</h4>
                         <p className="text-sm text-muted-foreground">
-                          Month {season.startMonth}, Day {season.startDay} -
-                          Month {season.endMonth}, Day {season.endDay}
+                          Mes {season.startMonth}, Día {season.startDay} - Mes{' '}
+                          {season.endMonth}, Día {season.endDay}
                         </p>
                       </div>
                     </div>
@@ -479,11 +486,11 @@ export function CalendarConfigDialog({
             {editingSeason && (
               <Card className="p-4 border-primary">
                 <CardHeader className="p-0 pb-4">
-                  <CardTitle className="text-lg">Edit Season</CardTitle>
+                  <CardTitle className="text-lg">Editar Estación</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 space-y-4">
                   <div>
-                    <Label>Season Name</Label>
+                    <Label>Nombre de la Estación</Label>
                     <Input
                       value={editingSeason.name}
                       onChange={e =>
@@ -496,7 +503,7 @@ export function CalendarConfigDialog({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label>Start Month</Label>
+                      <Label>Mes de Inicio</Label>
                       <Input
                         type="number"
                         min="1"
@@ -515,7 +522,7 @@ export function CalendarConfigDialog({
                       />
                     </div>
                     <div>
-                      <Label>Start Day</Label>
+                      <Label>Día de Inicio</Label>
                       <Input
                         type="number"
                         min="1"
@@ -536,7 +543,7 @@ export function CalendarConfigDialog({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label>End Month</Label>
+                      <Label>Mes de Fin</Label>
                       <Input
                         type="number"
                         min="1"
@@ -555,7 +562,7 @@ export function CalendarConfigDialog({
                       />
                     </div>
                     <div>
-                      <Label>End Day</Label>
+                      <Label>Día de Fin</Label>
                       <Input
                         type="number"
                         min="1"
@@ -598,7 +605,7 @@ export function CalendarConfigDialog({
                   </div>
 
                   <div>
-                    <Label>Description</Label>
+                    <Label>Descripción</Label>
                     <Textarea
                       value={editingSeason.description || ''}
                       onChange={e =>
@@ -606,19 +613,19 @@ export function CalendarConfigDialog({
                           prev ? { ...prev, description: e.target.value } : null
                         )
                       }
-                      placeholder="Optional description of this season"
+                      placeholder="Descripción opcional de esta estación"
                     />
                   </div>
 
                   <div className="flex gap-2">
                     <Button onClick={() => updateSeason(editingSeason)}>
-                      Save Season
+                      Guardar Estación
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => setEditingSeason(null)}
                     >
-                      Cancel
+                      Cancelar
                     </Button>
                   </div>
                 </CardContent>
@@ -629,7 +636,7 @@ export function CalendarConfigDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Cancelar
           </Button>
           <Button
             onClick={handleSave}
@@ -639,7 +646,7 @@ export function CalendarConfigDialog({
               !config.monthNames?.length
             }
           >
-            {existingConfig ? 'Update Calendar' : 'Create Calendar'}
+            {existingConfig ? 'Actualizar Calendario' : 'Crear Calendario'}
           </Button>
         </DialogFooter>
       </DialogContent>
