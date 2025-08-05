@@ -190,9 +190,10 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
   return (
     <Card
       className={cn(
-        'transition-all duration-200 hover:shadow-lg bg-gradient-to-br',
+        'transition-all duration-200 hover:shadow-lg bg-gradient-to-br cursor-pointer',
         getLocationGradient(location.type)
       )}
+      onClick={() => router.push(`/maps/${location.id}`)}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
@@ -271,19 +272,30 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
           {/* Action Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={e => e.stopPropagation()}
+              >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEditLocation(location)}>
+              <DropdownMenuItem
+                onClick={e => {
+                  e.stopPropagation()
+                  onEditLocation(location)
+                }}
+              >
                 <Edit className="h-4 w-4 mr-2" />
                 Editar
               </DropdownMenuItem>
 
               {location.type === 'location' && (
                 <DropdownMenuItem
-                  onClick={() => {
+                  onClick={e => {
+                    e.stopPropagation()
                     const existingMaps = getMapsByLocation(location.id)
                     if (existingMaps.length > 0 && existingMaps[0]) {
                       router.push(
@@ -305,7 +317,10 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
                 validChildTypes.map(childType => (
                   <DropdownMenuItem
                     key={childType}
-                    onClick={() => onAddLocation(location.id, childType)}
+                    onClick={e => {
+                      e.stopPropagation()
+                      onAddLocation(location.id, childType)
+                    }}
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Añadir {getLocationTypeLabel(childType)}
@@ -314,7 +329,10 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
 
               <Separator />
               <DropdownMenuItem
-                onClick={() => onDeleteLocation(location)}
+                onClick={e => {
+                  e.stopPropagation()
+                  onDeleteLocation(location)
+                }}
                 className="text-destructive"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -517,10 +535,11 @@ const LocationCard: React.FC<LocationCardProps> = ({
     <div className={cn('space-y-4', level > 0 && 'ml-8')}>
       <Card
         className={cn(
-          'transition-all duration-200 hover:shadow-lg bg-gradient-to-br',
+          'transition-all duration-200 hover:shadow-lg bg-gradient-to-br cursor-pointer',
           getLocationGradient(location.type),
           level === 0 && 'shadow-md'
         )}
+        onClick={() => router.push(`/maps/${location.id}`)}
       >
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
@@ -531,7 +550,10 @@ const LocationCard: React.FC<LocationCardProps> = ({
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 p-0 mt-1"
-                  onClick={handleToggleExpand}
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleToggleExpand()
+                  }}
                 >
                   {isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
@@ -611,19 +633,30 @@ const LocationCard: React.FC<LocationCardProps> = ({
             {/* Action Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={e => e.stopPropagation()}
+                >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEditLocation(location)}>
+                <DropdownMenuItem
+                  onClick={e => {
+                    e.stopPropagation()
+                    onEditLocation(location)
+                  }}
+                >
                   <Edit className="h-4 w-4 mr-2" />
                   Editar
                 </DropdownMenuItem>
 
                 {location.type === 'location' && (
                   <DropdownMenuItem
-                    onClick={() => {
+                    onClick={e => {
+                      e.stopPropagation()
                       const existingMaps = getMapsByLocation(location.id)
                       if (existingMaps.length > 0 && existingMaps[0]) {
                         router.push(
@@ -645,7 +678,10 @@ const LocationCard: React.FC<LocationCardProps> = ({
                   validChildTypes.map(childType => (
                     <DropdownMenuItem
                       key={childType}
-                      onClick={() => onAddLocation(location.id, childType)}
+                      onClick={e => {
+                        e.stopPropagation()
+                        onAddLocation(location.id, childType)
+                      }}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Añadir {getLocationTypeLabel(childType)}
@@ -654,7 +690,10 @@ const LocationCard: React.FC<LocationCardProps> = ({
 
                 <Separator />
                 <DropdownMenuItem
-                  onClick={() => onDeleteLocation(location)}
+                  onClick={e => {
+                    e.stopPropagation()
+                    onDeleteLocation(location)
+                  }}
                   className="text-destructive"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />

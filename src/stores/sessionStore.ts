@@ -56,6 +56,7 @@ interface SessionState extends PersistState {
   getLocationChildren: (parentId: string) => AnyLocation[]
   getLocationsByType: (type: LocationType) => AnyLocation[]
   getLocationHierarchy: () => AnyLocation[]
+  getLocationById: (locationId: string) => AnyLocation | undefined
 
   addLore: (lore: Lore) => void
   updateLore: (loreId: string, updates: Partial<Lore>) => void
@@ -342,6 +343,11 @@ export const useSessionStore = create<SessionState>()(
 
         addLocationWithChildren() // Start with root locations (planes)
         return hierarchy
+      },
+
+      getLocationById: locationId => {
+        const { locations } = get()
+        return locations.find(location => location.id === locationId)
       },
 
       addLore: lore => {

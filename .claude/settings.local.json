@@ -21,7 +21,8 @@
       "Bash(rm:*)",
       "Bash(npm run lint)",
       "Bash(npm test)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": []
   }

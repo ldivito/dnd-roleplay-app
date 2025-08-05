@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   ChevronDown,
   ChevronRight,
@@ -76,6 +77,7 @@ const LocationNode: React.FC<LocationNodeProps> = ({
   onAddLocation,
   onDeleteLocation,
 }) => {
+  const router = useRouter()
   const { getLocationChildren } = useSessionStore()
   const children = getLocationChildren(location.id)
   const hasChildren = children.length > 0
@@ -128,13 +130,17 @@ const LocationNode: React.FC<LocationNodeProps> = ({
           `ml-${level * 4}`
         )}
         style={{ marginLeft: `${level * 16}px` }}
+        onClick={() => router.push(`/maps/${location.id}`)}
       >
         {/* Expand/Collapse Button */}
         <Button
           variant="ghost"
           size="sm"
           className="h-6 w-6 p-0"
-          onClick={handleToggleExpand}
+          onClick={e => {
+            e.stopPropagation()
+            handleToggleExpand()
+          }}
           disabled={!hasChildren}
         >
           {hasChildren ? (
@@ -174,7 +180,10 @@ const LocationNode: React.FC<LocationNodeProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+        <div
+          className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+          onClick={e => e.stopPropagation()}
+        >
           {canAddChildren &&
             validChildTypes.map(childType => (
               <Button
