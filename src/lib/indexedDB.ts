@@ -29,6 +29,12 @@ class IndexedDBManager {
   private db: IDBDatabase | null = null
 
   async init(): Promise<void> {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
+      console.warn('IndexedDB not available (likely SSR environment)')
+      return Promise.resolve()
+    }
+
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION)
 
@@ -68,10 +74,18 @@ class IndexedDBManager {
   }
 
   async saveCampaign(campaign: CampaignDB): Promise<void> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot save campaign during SSR')
+      return Promise.resolve()
+    }
+
     if (!this.db) {
       await this.init()
     }
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {
+      console.warn('Database not available')
+      return Promise.resolve()
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORES.CAMPAIGNS], 'readwrite')
@@ -88,10 +102,18 @@ class IndexedDBManager {
   }
 
   async getCampaign(id: string): Promise<CampaignDB | null> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot get campaign during SSR')
+      return Promise.resolve(null)
+    }
+
     if (!this.db) {
       await this.init()
     }
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {
+      console.warn('Database not available')
+      return Promise.resolve(null)
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORES.CAMPAIGNS], 'readonly')
@@ -104,10 +126,18 @@ class IndexedDBManager {
   }
 
   async getAllCampaigns(): Promise<CampaignDB[]> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot get campaigns during SSR')
+      return Promise.resolve([])
+    }
+
     if (!this.db) {
       await this.init()
     }
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {
+      console.warn('Database not available')
+      return Promise.resolve([])
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORES.CAMPAIGNS], 'readonly')
@@ -120,10 +150,18 @@ class IndexedDBManager {
   }
 
   async saveBackup(backup: BackupRecord): Promise<void> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot save backup during SSR')
+      return Promise.resolve()
+    }
+
     if (!this.db) {
       await this.init()
     }
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {
+      console.warn('Database not available')
+      return Promise.resolve()
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORES.BACKUPS], 'readwrite')
@@ -136,10 +174,18 @@ class IndexedDBManager {
   }
 
   async getAllBackups(): Promise<BackupRecord[]> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot get backups during SSR')
+      return Promise.resolve([])
+    }
+
     if (!this.db) {
       await this.init()
     }
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {
+      console.warn('Database not available')
+      return Promise.resolve([])
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORES.BACKUPS], 'readonly')
@@ -158,10 +204,18 @@ class IndexedDBManager {
   }
 
   async getBackup(id: string): Promise<BackupRecord | null> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot get backup during SSR')
+      return Promise.resolve(null)
+    }
+
     if (!this.db) {
       await this.init()
     }
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {
+      console.warn('Database not available')
+      return Promise.resolve(null)
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORES.BACKUPS], 'readonly')
@@ -174,10 +228,18 @@ class IndexedDBManager {
   }
 
   async deleteBackup(id: string): Promise<void> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot delete backup during SSR')
+      return Promise.resolve()
+    }
+
     if (!this.db) {
       await this.init()
     }
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {
+      console.warn('Database not available')
+      return Promise.resolve()
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORES.BACKUPS], 'readwrite')
@@ -190,6 +252,11 @@ class IndexedDBManager {
   }
 
   async cleanupOldBackups(maxBackups: number = 10): Promise<void> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot cleanup backups during SSR')
+      return Promise.resolve()
+    }
+
     if (!this.db) {
       await this.init()
     }
@@ -206,10 +273,18 @@ class IndexedDBManager {
   }
 
   async getSetting(key: string): Promise<any> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot get setting during SSR')
+      return Promise.resolve(null)
+    }
+
     if (!this.db) {
       await this.init()
     }
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {
+      console.warn('Database not available')
+      return Promise.resolve(null)
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORES.SETTINGS], 'readonly')
@@ -222,10 +297,18 @@ class IndexedDBManager {
   }
 
   async setSetting(key: string, value: any): Promise<void> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot set setting during SSR')
+      return Promise.resolve()
+    }
+
     if (!this.db) {
       await this.init()
     }
-    if (!this.db) throw new Error('Database not initialized')
+    if (!this.db) {
+      console.warn('Database not available')
+      return Promise.resolve()
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([STORES.SETTINGS], 'readwrite')
@@ -238,6 +321,11 @@ class IndexedDBManager {
   }
 
   async migrateFromLocalStorage(): Promise<void> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot migrate from localStorage during SSR')
+      return Promise.resolve()
+    }
+
     try {
       const existingData = localStorage.getItem('dnd-session-storage')
       if (!existingData) return

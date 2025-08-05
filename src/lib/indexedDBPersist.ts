@@ -52,6 +52,11 @@ async function saveStateToIndexedDB<T>(
   state: T,
   options: PersistOptions
 ): Promise<void> {
+  // Skip during SSR
+  if (typeof window === 'undefined') {
+    return
+  }
+
   try {
     await dbManager.init()
 
@@ -109,6 +114,12 @@ async function loadStateFromIndexedDB(
   options: PersistOptions
 ): Promise<void> {
   try {
+    // Skip during SSR
+    if (typeof window === 'undefined') {
+      set({ hasHydrated: true })
+      return
+    }
+
     await dbManager.init()
 
     // Check for migration from localStorage first
@@ -165,6 +176,11 @@ export async function createManualBackup(name?: string): Promise<string> {
 }
 
 export async function restoreFromBackup(backupId: string): Promise<void> {
+  if (typeof window === 'undefined') {
+    console.warn('Cannot restore backup during SSR')
+    return
+  }
+
   await backupSystem.restoreBackup(backupId)
   // Reload the page to trigger store rehydration
   window.location.reload()

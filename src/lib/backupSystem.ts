@@ -20,6 +20,12 @@ class BackupSystem {
   private config: BackupConfig = DEFAULT_CONFIG
 
   async init(): Promise<void> {
+    // Skip during SSR
+    if (typeof window === 'undefined') {
+      console.warn('Cannot initialize backup system during SSR')
+      return
+    }
+
     try {
       // Ensure IndexedDB is initialized first
       await dbManager.init()
@@ -43,6 +49,11 @@ class BackupSystem {
 
   async updateConfig(newConfig: Partial<BackupConfig>): Promise<void> {
     this.config = { ...this.config, ...newConfig }
+
+    if (typeof window === 'undefined') {
+      console.warn('Cannot update backup config during SSR')
+      return
+    }
 
     try {
       await dbManager.init()
@@ -86,6 +97,11 @@ class BackupSystem {
   }
 
   async createAutoBackup(): Promise<string> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot create auto backup during SSR')
+      return ''
+    }
+
     try {
       // Ensure IndexedDB is initialized
       await dbManager.init()
@@ -137,6 +153,11 @@ class BackupSystem {
   }
 
   async createManualBackup(name?: string): Promise<string> {
+    if (typeof window === 'undefined') {
+      console.warn('Cannot create manual backup during SSR')
+      return ''
+    }
+
     try {
       // Ensure IndexedDB is initialized
       await dbManager.init()

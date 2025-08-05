@@ -1,10 +1,12 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import {
   Home,
   Users,
@@ -23,6 +25,16 @@ import {
   Library,
   Database,
   Calendar,
+  Search,
+  ChevronDown,
+  ChevronRight,
+  Star,
+  Clock,
+  Hash,
+  Gamepad2,
+  PenTool,
+  Archive,
+  Wrench,
 } from 'lucide-react'
 
 interface NavItem {
@@ -30,275 +42,265 @@ interface NavItem {
   href: string
   icon: React.ComponentType<{ className?: string | undefined }>
   description?: string
+  keywords?: string[]
+  badge?: string
+  isNew?: boolean
 }
 
-// Organized navigation with logical groupings
-const coreToolsItems: NavItem[] = [
-  {
-    title: 'Tablero',
-    href: '/',
-    icon: Home,
-    description: 'Panel principal del DM',
-  },
-  {
-    title: 'Sesión',
-    href: '/session',
-    icon: Crown,
-    description: 'Gestión de sesión actual',
-  },
-  {
-    title: 'Calendario',
-    href: '/calendar',
-    icon: Calendar,
-    description: 'Sistema de calendario personalizado',
-  },
-  {
-    title: 'Combate',
-    href: '/combat',
-    icon: Sword,
-    description: 'Iniciativa y rastreador de combate',
-  },
-  {
-    title: 'Dados',
-    href: '/dice',
-    icon: Dice1,
-    description: 'Utilidades de dados',
-  },
-]
+interface NavCategory {
+  id: string
+  title: string
+  icon: React.ComponentType<{ className?: string | undefined }>
+  items: NavItem[]
+  defaultExpanded?: boolean
+  color?: string
+}
 
-const charactersAndWorldItems: NavItem[] = [
+// Enhanced navigation with organized categories
+const navigationCategories: NavCategory[] = [
   {
-    title: 'Personajes',
-    href: '/characters',
+    id: 'session',
+    title: 'Herramientas de Sesión',
+    icon: Gamepad2,
+    defaultExpanded: true,
+    color: 'text-blue-500',
+    items: [
+      {
+        title: 'Tablero',
+        href: '/',
+        icon: Home,
+        description: 'Panel principal del DM',
+        keywords: ['dashboard', 'inicio', 'home', 'panel'],
+      },
+      {
+        title: 'Sesión Activa',
+        href: '/session',
+        icon: Crown,
+        description: 'Gestión de sesión actual',
+        keywords: ['session', 'actual', 'live'],
+        badge: 'Live',
+      },
+      {
+        title: 'Combate',
+        href: '/combat',
+        icon: Sword,
+        description: 'Iniciativa y rastreador de combate',
+        keywords: ['combat', 'fight', 'battle', 'iniciativa'],
+      },
+      {
+        title: 'Dados',
+        href: '/dice',
+        icon: Dice1,
+        description: 'Utilidades de dados',
+        keywords: ['dice', 'roll', 'random'],
+      },
+    ],
+  },
+  {
+    id: 'world',
+    title: 'Mundo y Personajes',
     icon: Users,
-    description: 'Gestión de jugadores',
+    defaultExpanded: true,
+    color: 'text-green-500',
+    items: [
+      {
+        title: 'Personajes',
+        href: '/characters',
+        icon: Users,
+        description: 'Gestión de jugadores',
+        keywords: ['characters', 'players', 'jugadores', 'pcs'],
+      },
+      {
+        title: 'NPCs',
+        href: '/npcs',
+        icon: Users,
+        description: 'Personajes no jugadores',
+        keywords: ['npcs', 'non-player', 'characters'],
+      },
+      {
+        title: 'Mapas y Ubicaciones',
+        href: '/maps',
+        icon: Map,
+        description: 'Mapas del mundo y ubicaciones',
+        keywords: ['maps', 'locations', 'places', 'world'],
+      },
+      {
+        title: 'Grupos y Facciones',
+        href: '/factions',
+        icon: Building,
+        description: 'Organizaciones, gremios y facciones',
+        keywords: ['factions', 'groups', 'organizations', 'guilds'],
+      },
+    ],
   },
   {
-    title: 'NPCs',
-    href: '/npcs',
-    icon: Users,
-    description: 'Personajes no jugadores',
+    id: 'story',
+    title: 'Historia y Contenido',
+    icon: PenTool,
+    defaultExpanded: false,
+    color: 'text-purple-500',
+    items: [
+      {
+        title: 'Calendario',
+        href: '/calendar',
+        icon: Calendar,
+        description: 'Sistema de calendario personalizado',
+        keywords: ['calendar', 'time', 'dates', 'events'],
+        isNew: true,
+      },
+      {
+        title: 'Misiones',
+        href: '/quests',
+        icon: Target,
+        description: 'Sistema de misiones y objetivos',
+        keywords: ['quests', 'missions', 'objectives', 'goals'],
+      },
+      {
+        title: 'Lore y Tradiciones',
+        href: '/lore',
+        icon: Scroll,
+        description: 'Historia, leyendas y conocimiento del mundo',
+        keywords: ['lore', 'history', 'legends', 'knowledge'],
+      },
+      {
+        title: 'Notas de Campaña',
+        href: '/notes',
+        icon: BookOpen,
+        description: 'Notas de historia y lore',
+        keywords: ['notes', 'campaign', 'story'],
+      },
+    ],
   },
   {
-    title: 'Mapas y Ubicaciones',
-    href: '/maps',
-    icon: Map,
-    description: 'Mapas del mundo y ubicaciones',
-  },
-  {
-    title: 'Grupos y Facciones',
-    href: '/factions',
-    icon: Building,
-    description: 'Organizaciones, gremios y facciones',
-  },
-]
-
-const storyAndContentItems: NavItem[] = [
-  {
-    title: 'Misiones',
-    href: '/quests',
-    icon: Target,
-    description: 'Sistema de misiones y objetivos',
-  },
-  {
-    title: 'Lore y Tradiciones',
-    href: '/lore',
-    icon: Scroll,
-    description: 'Historia, leyendas y conocimiento del mundo',
-  },
-  {
-    title: 'Notas de Campaña',
-    href: '/notes',
-    icon: BookOpen,
-    description: 'Notas de historia y lore',
-  },
-]
-
-const compendiumItems: NavItem[] = [
-  {
+    id: 'compendium',
     title: 'Compendio',
-    href: '/compendium',
     icon: Library,
-    description: 'Biblioteca mágica principal',
+    defaultExpanded: false,
+    color: 'text-amber-500',
+    items: [
+      {
+        title: 'Biblioteca Principal',
+        href: '/compendium',
+        icon: Library,
+        description: 'Biblioteca mágica principal',
+        keywords: ['compendium', 'library', 'reference'],
+      },
+      {
+        title: 'Hechizos',
+        href: '/compendium/spells',
+        icon: Zap,
+        description: 'Biblioteca de hechizos',
+        keywords: ['spells', 'magic', 'arcane'],
+      },
+      {
+        title: 'Objetos',
+        href: '/compendium/items',
+        icon: Package,
+        description: 'Equipo y objetos mágicos',
+        keywords: ['items', 'equipment', 'gear', 'magic items'],
+      },
+    ],
   },
   {
-    title: 'Hechizos',
-    href: '/compendium/spells',
-    icon: Zap,
-    description: 'Biblioteca de hechizos',
-  },
-  {
-    title: 'Objetos',
-    href: '/compendium/items',
-    icon: Package,
-    description: 'Equipo y objetos mágicos',
+    id: 'admin',
+    title: 'Administración',
+    icon: Wrench,
+    defaultExpanded: false,
+    color: 'text-red-500',
+    items: [
+      {
+        title: 'Configuración',
+        href: '/settings',
+        icon: Settings,
+        description: 'Configuración de la aplicación',
+        keywords: ['settings', 'config', 'preferences'],
+      },
+      {
+        title: 'Base de Datos',
+        href: '/settings/database',
+        icon: Database,
+        description: 'Depuración y estado de la base de datos',
+        keywords: ['database', 'debug', 'data'],
+      },
+    ],
   },
 ]
 
-// Combine all navigation items
-const navigationItems: NavItem[] = [
-  ...coreToolsItems,
-  ...charactersAndWorldItems,
-  ...storyAndContentItems,
-  ...compendiumItems,
-]
-
-const adminItems: NavItem[] = [
-  {
-    title: 'Configuración',
-    href: '/settings',
-    icon: Settings,
-    description: 'Configuración de la aplicación',
-  },
-  {
-    title: 'Base de Datos',
-    href: '/settings/database',
-    icon: Database,
-    description: 'Depuración y estado de la base de datos',
-  },
-]
+// Flatten all items for search
+const allNavigationItems: NavItem[] = navigationCategories.flatMap(
+  category => category.items
+)
 
 interface SidebarProps {
   className?: string
 }
 
-export default function Sidebar({ className }: SidebarProps) {
-  const pathname = usePathname()
+interface CollapsibleCategoryProps {
+  category: NavCategory
+  pathname: string
+  isExpanded: boolean
+  onToggle: () => void
+  searchQuery: string
+}
+
+function CollapsibleCategory({
+  category,
+  pathname,
+  isExpanded,
+  onToggle,
+  searchQuery,
+}: CollapsibleCategoryProps) {
+  const CategoryIcon = category.icon
+  const hasActiveItem = category.items.some(
+    item =>
+      pathname === item.href ||
+      (item.href === '/settings/database' &&
+        pathname.startsWith('/settings/database'))
+  )
+
+  const filteredItems = useMemo(() => {
+    if (!searchQuery) return category.items
+
+    return category.items.filter(item => {
+      const searchLower = searchQuery.toLowerCase()
+      return (
+        item.title.toLowerCase().includes(searchLower) ||
+        item.description?.toLowerCase().includes(searchLower) ||
+        item.keywords?.some(keyword =>
+          keyword.toLowerCase().includes(searchLower)
+        )
+      )
+    })
+  }, [category.items, searchQuery])
+
+  if (searchQuery && filteredItems.length === 0) {
+    return null
+  }
 
   return (
-    <div className={cn('pb-4 w-64 h-full flex flex-col', className)}>
-      <div className="px-3 py-4">
-        <div className="flex items-center gap-2 mb-6">
-          <Shield className="h-6 w-6 text-primary" />
-          <h2 className="text-lg font-semibold tracking-tight">
-            Panel de Control DM
-          </h2>
-        </div>
-      </div>
+    <div className="mb-3">
+      <Button
+        variant="ghost"
+        className={cn(
+          'w-full justify-start gap-2 h-8 px-2 text-sm font-medium',
+          hasActiveItem && 'text-primary',
+          category.color
+        )}
+        onClick={onToggle}
+      >
+        <CategoryIcon className="h-4 w-4" />
+        <span className="flex-1 text-left">{category.title}</span>
+        {!searchQuery &&
+          (isExpanded ? (
+            <ChevronDown className="h-3 w-3" />
+          ) : (
+            <ChevronRight className="h-3 w-3" />
+          ))}
+      </Button>
 
-      {/* Main Navigation - Takes most of the space */}
-      <div className="flex-1 px-3 overflow-y-auto">
-        <h3 className="mb-3 px-2 text-sm font-semibold tracking-tight text-muted-foreground">
-          Herramientas de Campaña
-        </h3>
-
-        {/* Core Tools */}
-        <div className="space-y-1 mb-4">
-          {coreToolsItems.map(item => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
-
-            return (
-              <Button
-                key={item.href}
-                variant={isActive ? 'secondary' : 'ghost'}
-                className={cn(
-                  'w-full justify-start gap-2 h-9 text-sm',
-                  isActive && 'bg-secondary'
-                )}
-                asChild
-              >
-                <Link href={item.href}>
-                  <Icon className="h-4 w-4" />
-                  {item.title}
-                </Link>
-              </Button>
-            )
-          })}
-        </div>
-
-        {/* Characters & World */}
-        <div className="space-y-1 mb-4">
-          <div className="px-2 mb-2">
-            <div className="h-px bg-border" />
-          </div>
-          {charactersAndWorldItems.map(item => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
-
-            return (
-              <Button
-                key={item.href}
-                variant={isActive ? 'secondary' : 'ghost'}
-                className={cn(
-                  'w-full justify-start gap-2 h-9 text-sm',
-                  isActive && 'bg-secondary'
-                )}
-                asChild
-              >
-                <Link href={item.href}>
-                  <Icon className="h-4 w-4" />
-                  {item.title}
-                </Link>
-              </Button>
-            )
-          })}
-        </div>
-
-        {/* Story & Content */}
-        <div className="space-y-1 mb-4">
-          <div className="px-2 mb-2">
-            <div className="h-px bg-border" />
-          </div>
-          {storyAndContentItems.map(item => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
-
-            return (
-              <Button
-                key={item.href}
-                variant={isActive ? 'secondary' : 'ghost'}
-                className={cn(
-                  'w-full justify-start gap-2 h-9 text-sm',
-                  isActive && 'bg-secondary'
-                )}
-                asChild
-              >
-                <Link href={item.href}>
-                  <Icon className="h-4 w-4" />
-                  {item.title}
-                </Link>
-              </Button>
-            )
-          })}
-        </div>
-
-        {/* Compendium */}
-        <div className="space-y-1">
-          <div className="px-2 mb-2">
-            <div className="h-px bg-border" />
-          </div>
-          {compendiumItems.map(item => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
-
-            return (
-              <Button
-                key={item.href}
-                variant={isActive ? 'secondary' : 'ghost'}
-                className={cn(
-                  'w-full justify-start gap-2 h-9 text-sm',
-                  isActive && 'bg-secondary'
-                )}
-                asChild
-              >
-                <Link href={item.href}>
-                  <Icon className="h-4 w-4" />
-                  {item.title}
-                </Link>
-              </Button>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Admin Section - Fixed at bottom */}
-      <div className="px-3 py-3 border-t">
-        <h3 className="mb-2 px-2 text-sm font-semibold tracking-tight text-muted-foreground">
-          Administración
-        </h3>
-        <div className="space-y-1">
-          {adminItems.map(item => {
+      {(isExpanded || searchQuery) && (
+        <div className="mt-1 space-y-1 ml-1">
+          {filteredItems.map(item => {
             const Icon = item.icon
             const isActive =
               pathname === item.href ||
@@ -310,18 +312,234 @@ export default function Sidebar({ className }: SidebarProps) {
                 key={item.href}
                 variant={isActive ? 'secondary' : 'ghost'}
                 className={cn(
-                  'w-full justify-start gap-2 h-9 text-sm',
+                  'w-full justify-start gap-2 h-8 text-sm pl-4',
                   isActive && 'bg-secondary'
                 )}
                 asChild
               >
                 <Link href={item.href}>
-                  <Icon className="h-4 w-4" />
-                  {item.title}
+                  <Icon className="h-3.5 w-3.5" />
+                  <span className="flex-1 text-left">{item.title}</span>
+                  {item.badge && (
+                    <Badge variant="secondary" className="h-4 text-xs px-1.5">
+                      {item.badge}
+                    </Badge>
+                  )}
+                  {item.isNew && (
+                    <Badge
+                      variant="default"
+                      className="h-4 text-xs px-1.5 bg-green-500"
+                    >
+                      New
+                    </Badge>
+                  )}
                 </Link>
               </Button>
             )
           })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function Sidebar({ className }: SidebarProps) {
+  const pathname = usePathname()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set(
+      navigationCategories.filter(cat => cat.defaultExpanded).map(cat => cat.id)
+    )
+  )
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  const [recentItems, setRecentItems] = useState<string[]>([])
+
+  const toggleCategory = (categoryId: string) => {
+    const newExpanded = new Set(expandedCategories)
+    if (newExpanded.has(categoryId)) {
+      newExpanded.delete(categoryId)
+    } else {
+      newExpanded.add(categoryId)
+    }
+    setExpandedCategories(newExpanded)
+  }
+
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery) return navigationCategories
+
+    return navigationCategories.filter(category => {
+      const hasMatchingItems = category.items.some(item => {
+        const searchLower = searchQuery.toLowerCase()
+        return (
+          item.title.toLowerCase().includes(searchLower) ||
+          item.description?.toLowerCase().includes(searchLower) ||
+          item.keywords?.some(keyword =>
+            keyword.toLowerCase().includes(searchLower)
+          )
+        )
+      })
+
+      return (
+        hasMatchingItems ||
+        category.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    })
+  }, [searchQuery])
+
+  const quickAccessItems = useMemo(() => {
+    const favoriteItems = allNavigationItems.filter(item =>
+      favorites.has(item.href)
+    )
+    const recentNavItems = recentItems
+      .map(href => allNavigationItems.find(item => item.href === href))
+      .filter(Boolean) as NavItem[]
+
+    return { favorites: favoriteItems, recent: recentNavItems }
+  }, [favorites, recentItems])
+
+  return (
+    <div
+      className={cn(
+        'pb-4 w-64 h-full flex flex-col bg-background border-r',
+        className
+      )}
+    >
+      {/* Header */}
+      <div className="px-3 py-4 border-b">
+        <div className="flex items-center gap-2 mb-4">
+          <Shield className="h-6 w-6 text-primary" />
+          <h2 className="text-lg font-semibold tracking-tight">
+            Panel de Control DM
+          </h2>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar herramientas..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="pl-9 h-9 text-sm"
+          />
+        </div>
+      </div>
+
+      {/* Quick Access */}
+      {!searchQuery &&
+        (quickAccessItems.favorites.length > 0 ||
+          quickAccessItems.recent.length > 0) && (
+          <div className="px-3 py-3 border-b">
+            {quickAccessItems.favorites.length > 0 && (
+              <div className="mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Star className="h-3.5 w-3.5 text-amber-500" />
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Favoritos
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {quickAccessItems.favorites.slice(0, 3).map(item => {
+                    const Icon = item.icon
+                    const isActive = pathname === item.href
+
+                    return (
+                      <Button
+                        key={item.href}
+                        variant={isActive ? 'secondary' : 'ghost'}
+                        size="sm"
+                        className="w-full justify-start gap-2 h-7 text-xs"
+                        asChild
+                      >
+                        <Link href={item.href}>
+                          <Icon className="h-3 w-3" />
+                          {item.title}
+                        </Link>
+                      </Button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {quickAccessItems.recent.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="h-3.5 w-3.5 text-blue-500" />
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Recientes
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {quickAccessItems.recent.slice(0, 3).map(item => {
+                    const Icon = item.icon
+                    const isActive = pathname === item.href
+
+                    return (
+                      <Button
+                        key={item.href}
+                        variant={isActive ? 'secondary' : 'ghost'}
+                        size="sm"
+                        className="w-full justify-start gap-2 h-7 text-xs"
+                        asChild
+                      >
+                        <Link href={item.href}>
+                          <Icon className="h-3 w-3" />
+                          {item.title}
+                        </Link>
+                      </Button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+      {/* Main Navigation */}
+      <div className="flex-1 px-3 py-3 overflow-y-auto">
+        {searchQuery && (
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Hash className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">
+                Resultados para &quot;{searchQuery}&quot;
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          {filteredCategories.map(category => (
+            <CollapsibleCategory
+              key={category.id}
+              category={category}
+              pathname={pathname}
+              isExpanded={expandedCategories.has(category.id)}
+              onToggle={() => toggleCategory(category.id)}
+              searchQuery={searchQuery}
+            />
+          ))}
+        </div>
+
+        {searchQuery && filteredCategories.length === 0 && (
+          <div className="text-center py-8">
+            <Search className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground">
+              No se encontraron resultados para &quot;{searchQuery}&quot;
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Footer Info */}
+      <div className="px-3 py-2 border-t">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{allNavigationItems.length} herramientas</span>
+          <div className="flex items-center gap-1">
+            <Archive className="h-3 w-3" />
+            <span>v1.0</span>
+          </div>
         </div>
       </div>
     </div>

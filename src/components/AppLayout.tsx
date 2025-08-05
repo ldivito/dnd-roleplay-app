@@ -18,9 +18,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <div className="min-h-screen bg-background">
       {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-card px-6 pb-4">
-          <Sidebar />
-        </div>
+        <Sidebar />
       </div>
 
       {/* Mobile Header */}
