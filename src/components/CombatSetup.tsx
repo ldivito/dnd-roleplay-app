@@ -326,7 +326,7 @@ export default function CombatSetup({
                         <div>
                           <h4 className="font-medium">{npc.name}</h4>
                           <p className="text-sm text-muted-foreground">
-                            {npc.race} {npc.class}
+                            {npc.race} {npc.background}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge

@@ -8,7 +8,25 @@ import type { Item } from '@/types/item'
 import type { AnyLocation, LocationType } from '@/types/location'
 import type { Lore, Era } from '@/types/lore'
 import { DEFAULT_ERAS } from '@/types/lore'
-import type { NPC } from '@/types/npc'
+import type {
+  NPC,
+  BackgroundOption,
+  RaceOption,
+  NPCTypeOption,
+  NPCImportanceOption,
+  TaxonomyOption,
+} from '@/types/npc'
+import {
+  DEFAULT_BACKGROUNDS,
+  DEFAULT_RACES,
+  DEFAULT_NPC_TYPES,
+  DEFAULT_NPC_IMPORTANCE,
+  DEFAULT_TRAITS,
+  DEFAULT_IDEALS,
+  DEFAULT_BONDS,
+  DEFAULT_FLAWS,
+  DEFAULT_MANNERISMS,
+} from '@/types/npc'
 import type { Quest } from '@/types/quest'
 import type { Faction } from '@/types/faction'
 import type { LocationMap } from '@/types/map'
@@ -25,6 +43,15 @@ interface SessionState extends PersistState {
   lore: Lore[]
   eras: Era[]
   npcs: NPC[]
+  backgrounds: BackgroundOption[]
+  races: RaceOption[]
+  npcTypes: NPCTypeOption[]
+  npcImportance: NPCImportanceOption[]
+  traits: TaxonomyOption[]
+  ideals: TaxonomyOption[]
+  bonds: TaxonomyOption[]
+  flaws: TaxonomyOption[]
+  mannerisms: TaxonomyOption[]
   quests: Quest[]
   factions: Faction[]
   maps: LocationMap[]
@@ -77,6 +104,40 @@ interface SessionState extends PersistState {
   getNPCsByLocation: (locationId: string) => NPC[]
   getNPCsWithRelationships: () => NPC[]
 
+  addBackground: (background: BackgroundOption) => void
+  updateBackground: (
+    backgroundId: string,
+    updates: Partial<BackgroundOption>
+  ) => void
+  removeBackground: (backgroundId: string) => void
+  getBackgroundById: (backgroundId: string) => BackgroundOption | undefined
+
+  addRace: (race: RaceOption) => void
+  updateRace: (raceId: string, updates: Partial<RaceOption>) => void
+  removeRace: (raceId: string) => void
+  getRaceById: (raceId: string) => RaceOption | undefined
+
+  addNPCType: (npcType: NPCTypeOption) => void
+  updateNPCType: (npcTypeId: string, updates: Partial<NPCTypeOption>) => void
+  removeNPCType: (npcTypeId: string) => void
+  getNPCTypeById: (npcTypeId: string) => NPCTypeOption | undefined
+
+  addNPCImportance: (importance: NPCImportanceOption) => void
+  updateNPCImportance: (
+    importanceId: string,
+    updates: Partial<NPCImportanceOption>
+  ) => void
+  removeNPCImportance: (importanceId: string) => void
+  getNPCImportanceById: (
+    importanceId: string
+  ) => NPCImportanceOption | undefined
+
+  addTrait: (trait: TaxonomyOption) => void
+  addIdeal: (ideal: TaxonomyOption) => void
+  addBond: (bond: TaxonomyOption) => void
+  addFlaw: (flaw: TaxonomyOption) => void
+  addMannerism: (mannerism: TaxonomyOption) => void
+
   addQuest: (quest: Quest) => void
   updateQuest: (questId: string, updates: Partial<Quest>) => void
   removeQuest: (questId: string) => void
@@ -120,6 +181,15 @@ export const useSessionStore = create<SessionState>()(
       lore: [],
       eras: DEFAULT_ERAS,
       npcs: [],
+      backgrounds: DEFAULT_BACKGROUNDS,
+      races: DEFAULT_RACES,
+      npcTypes: DEFAULT_NPC_TYPES,
+      npcImportance: DEFAULT_NPC_IMPORTANCE,
+      traits: DEFAULT_TRAITS,
+      ideals: DEFAULT_IDEALS,
+      bonds: DEFAULT_BONDS,
+      flaws: DEFAULT_FLAWS,
+      mannerisms: DEFAULT_MANNERISMS,
       quests: [],
       factions: [],
       maps: [],
@@ -462,6 +532,144 @@ export const useSessionStore = create<SessionState>()(
       getNPCsWithRelationships: () => {
         const { npcs } = get()
         return npcs.filter(npc => npc.relationships.length > 0)
+      },
+
+      addBackground: background => {
+        set(state => ({
+          backgrounds: [...state.backgrounds, background],
+        }))
+      },
+
+      updateBackground: (backgroundId, updates) => {
+        set(state => ({
+          backgrounds: state.backgrounds.map(background =>
+            background.id === backgroundId
+              ? { ...background, ...updates }
+              : background
+          ),
+        }))
+      },
+
+      removeBackground: backgroundId => {
+        set(state => ({
+          backgrounds: state.backgrounds.filter(
+            background => background.id !== backgroundId
+          ),
+        }))
+      },
+
+      getBackgroundById: backgroundId => {
+        const { backgrounds } = get()
+        return backgrounds.find(background => background.id === backgroundId)
+      },
+
+      addRace: race => {
+        set(state => ({
+          races: [...state.races, race],
+        }))
+      },
+
+      updateRace: (raceId, updates) => {
+        set(state => ({
+          races: state.races.map(race =>
+            race.id === raceId ? { ...race, ...updates } : race
+          ),
+        }))
+      },
+
+      removeRace: raceId => {
+        set(state => ({
+          races: state.races.filter(race => race.id !== raceId),
+        }))
+      },
+
+      getRaceById: raceId => {
+        const { races } = get()
+        return races.find(race => race.id === raceId)
+      },
+
+      addNPCType: npcType => {
+        set(state => ({
+          npcTypes: [...state.npcTypes, npcType],
+        }))
+      },
+
+      updateNPCType: (npcTypeId, updates) => {
+        set(state => ({
+          npcTypes: state.npcTypes.map(npcType =>
+            npcType.id === npcTypeId ? { ...npcType, ...updates } : npcType
+          ),
+        }))
+      },
+
+      removeNPCType: npcTypeId => {
+        set(state => ({
+          npcTypes: state.npcTypes.filter(npcType => npcType.id !== npcTypeId),
+        }))
+      },
+
+      getNPCTypeById: npcTypeId => {
+        const { npcTypes } = get()
+        return npcTypes.find(npcType => npcType.id === npcTypeId)
+      },
+
+      addNPCImportance: importance => {
+        set(state => ({
+          npcImportance: [...state.npcImportance, importance],
+        }))
+      },
+
+      updateNPCImportance: (importanceId, updates) => {
+        set(state => ({
+          npcImportance: state.npcImportance.map(importance =>
+            importance.id === importanceId
+              ? { ...importance, ...updates }
+              : importance
+          ),
+        }))
+      },
+
+      removeNPCImportance: importanceId => {
+        set(state => ({
+          npcImportance: state.npcImportance.filter(
+            importance => importance.id !== importanceId
+          ),
+        }))
+      },
+
+      getNPCImportanceById: importanceId => {
+        const { npcImportance } = get()
+        return npcImportance.find(importance => importance.id === importanceId)
+      },
+
+      addTrait: trait => {
+        set(state => ({
+          traits: [...state.traits, trait],
+        }))
+      },
+
+      addIdeal: ideal => {
+        set(state => ({
+          ideals: [...state.ideals, ideal],
+        }))
+      },
+
+      addBond: bond => {
+        set(state => ({
+          bonds: [...state.bonds, bond],
+        }))
+      },
+
+      addFlaw: flaw => {
+        set(state => ({
+          flaws: [...state.flaws, flaw],
+        }))
+      },
+
+      addMannerism: mannerism => {
+        set(state => ({
+          mannerisms: [...state.mannerisms, mannerism],
+        }))
       },
 
       addQuest: quest => {
