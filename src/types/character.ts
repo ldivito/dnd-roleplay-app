@@ -1,4 +1,9 @@
 import { z } from 'zod'
+import {
+  SpellSlotsSchema,
+  HitDicePoolSchema,
+  ClassResourceSchema,
+} from './rest'
 
 export const AbilityScoreSchema = z.object({
   strength: z.number().min(1).max(30),
@@ -73,6 +78,11 @@ export const CharacterSchema = z.object({
   initiative: z.number(),
   speed: z.number().min(0).default(30),
   proficiencyBonus: z.number().min(2),
+
+  // Rest & Resource Management
+  hitDicePool: HitDicePoolSchema.optional(),
+  spellSlots: SpellSlotsSchema.optional(),
+  classResources: z.array(ClassResourceSchema).optional(),
 
   // Features & Traits
   proficienciesAndLanguages: z.string().optional(),

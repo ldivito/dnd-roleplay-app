@@ -32,6 +32,16 @@ import type { Faction } from '@/types/faction'
 import type { LocationMap } from '@/types/map'
 import type { Taxonomy, TaxonomyCategory } from '@/types/taxonomy'
 import { DEFAULT_TAXONOMIES } from '@/types/taxonomy'
+import type { RestEvent } from '@/types/rest'
+import {
+  performShortRest,
+  performLongRest,
+  rollHitDice,
+  getConstitutionModifier,
+  initializeHitDicePool,
+  calculateSpellSlotsByLevel,
+  getDefaultClassResources,
+} from '@/lib/restHelpers'
 
 interface SessionState extends PersistState {
   currentSession: Session | null
@@ -58,6 +68,7 @@ interface SessionState extends PersistState {
   factions: Faction[]
   maps: LocationMap[]
   taxonomies: Taxonomy[]
+  restEvents: RestEvent[]
 
   // Actions
   createSession: (
@@ -173,6 +184,23 @@ interface SessionState extends PersistState {
     name: string
   ) => Taxonomy | undefined
   initializeTaxonomies: () => void
+  migrateCharactersForRest: () => void
+
+  // Rest Management Actions
+  takeShortRest: (
+    characterIds: string[],
+    location?: string,
+    notes?: string
+  ) => void
+  takeLongRest: (
+    characterIds: string[],
+    location?: string,
+    notes?: string
+  ) => void
+  spendHitDice: (characterId: string, diceCount: number) => number
+  addRestEvent: (event: RestEvent) => void
+  getRestHistory: () => RestEvent[]
+  getRestEventsByCharacter: (characterId: string) => RestEvent[]
 
   setInitiatives: (initiatives: Initiative[]) => void
   addDiceRoll: (roll: DiceRoll) => void
@@ -208,6 +236,7 @@ export const useSessionStore = create<SessionState>()(
       factions: [],
       maps: [],
       taxonomies: [],
+      restEvents: [],
 
       createSession: sessionData => {
         const session: Session = {
@@ -887,6 +916,232 @@ export const useSessionStore = create<SessionState>()(
         }
       },
 
+      migrateCharactersForRest: () => {
+        const { characters } = get()
+        let migrationNeeded = false
+
+        const migratedCharacters = characters.map(character => {
+          let updated = false
+          const updates: Partial<Character> = {}
+
+          // Initialize hit dice pool if missing
+          if (!character.hitDicePool) {
+            updates.hitDicePool = initializeHitDicePool(character)
+            updated = true
+          }
+
+          // Initialize spell slots if missing and character is a spellcaster
+          if (!character.spellSlots) {
+            const spellSlots = calculateSpellSlotsByLevel(
+              character.class,
+              character.level
+            )
+            if (spellSlots) {
+              updates.spellSlots = spellSlots
+              updated = true
+            }
+          }
+
+          // Initialize class resources if missing
+          if (!character.classResources) {
+            const resources = getDefaultClassResources(
+              character.class,
+              character.level
+            )
+            if (resources.length > 0) {
+              updates.classResources = resources
+              updated = true
+            }
+          }
+
+          if (updated) {
+            migrationNeeded = true
+            return {
+              ...character,
+              ...updates,
+              updatedAt: new Date(),
+            }
+          }
+
+          return character
+        })
+
+        if (migrationNeeded) {
+          set({ characters: migratedCharacters })
+          console.log(
+            'Migrated characters for rest system -',
+            migratedCharacters.length,
+            'characters updated'
+          )
+        }
+      },
+
+      // Rest Management Actions
+      takeShortRest: (characterIds, location, notes) => {
+        const { characters } = get()
+        const startTime = new Date()
+        const resourcesRestored: RestEvent['resourcesRestored'] = []
+
+        // Process short rest for each character
+        const updatedCharacters = characters.map(char => {
+          if (characterIds.includes(char.id)) {
+            const result = performShortRest(char)
+            const restore: RestEvent['resourcesRestored'][number] = {
+              characterId: char.id,
+              characterName: char.name,
+              hpRestored: result.hpRestored,
+              hitDiceRestored: 0,
+              resourcesRestored: result.resourcesRestored,
+            }
+            // Only add spellSlotsRestored if character is a Warlock
+            if (char.class === 'Brujo') {
+              restore.spellSlotsRestored = 1
+            }
+            resourcesRestored.push(restore)
+            return result.character
+          }
+          return char
+        })
+
+        // Create rest event
+        const restEvent: RestEvent = {
+          id: crypto.randomUUID(),
+          type: 'short',
+          startTime,
+          endTime: new Date(startTime.getTime() + 60 * 60 * 1000), // 1 hour later
+          participantIds: characterIds,
+          ...(location && { location }),
+          ...(notes && { notes }),
+          resourcesRestored,
+          interrupted: false,
+          createdAt: new Date(),
+        }
+
+        set(state => ({
+          characters: updatedCharacters,
+          restEvents: [...state.restEvents, restEvent],
+        }))
+      },
+
+      takeLongRest: (characterIds, location, notes) => {
+        const { characters } = get()
+        const startTime = new Date()
+        const resourcesRestored: RestEvent['resourcesRestored'] = []
+
+        // Process long rest for each character
+        const updatedCharacters = characters.map(char => {
+          if (characterIds.includes(char.id)) {
+            const result = performLongRest(char)
+            const restore: RestEvent['resourcesRestored'][number] = {
+              characterId: char.id,
+              characterName: char.name,
+              hpRestored: result.hpRestored,
+              hitDiceRestored: result.hitDiceRestored,
+              resourcesRestored: result.resourcesRestored,
+            }
+            // Only add spellSlotsRestored if character has spell slots
+            if (char.spellSlots) {
+              restore.spellSlotsRestored = 1
+            }
+            resourcesRestored.push(restore)
+            return result.character
+          }
+          return char
+        })
+
+        // Create rest event
+        const restEvent: RestEvent = {
+          id: crypto.randomUUID(),
+          type: 'long',
+          startTime,
+          endTime: new Date(startTime.getTime() + 8 * 60 * 60 * 1000), // 8 hours later
+          participantIds: characterIds,
+          ...(location && { location }),
+          ...(notes && { notes }),
+          resourcesRestored,
+          interrupted: false,
+          createdAt: new Date(),
+        }
+
+        set(state => ({
+          characters: updatedCharacters,
+          restEvents: [...state.restEvents, restEvent],
+        }))
+      },
+
+      spendHitDice: (characterId, diceCount) => {
+        const { characters } = get()
+        const character = characters.find(c => c.id === characterId)
+
+        if (!character || !character.hitDicePool) {
+          return 0
+        }
+
+        // Check if character has enough hit dice
+        const availableDice = character.hitDicePool.available
+        const actualDiceCount = Math.min(diceCount, availableDice)
+
+        if (actualDiceCount <= 0) {
+          return 0
+        }
+
+        // Roll hit dice and add CON modifier
+        const hpRecovered = rollHitDice(
+          character.hitDicePool.diceType,
+          character.abilityScores.constitution,
+          actualDiceCount
+        )
+
+        // Update character
+        const newHP = Math.min(
+          character.hitPoints.current + hpRecovered,
+          character.hitPoints.maximum
+        )
+
+        set(state => ({
+          characters: state.characters.map(char =>
+            char.id === characterId
+              ? {
+                  ...char,
+                  hitPoints: {
+                    ...char.hitPoints,
+                    current: newHP,
+                  },
+                  hitDicePool: char.hitDicePool
+                    ? {
+                        ...char.hitDicePool,
+                        available: char.hitDicePool.available - actualDiceCount,
+                      }
+                    : undefined,
+                  updatedAt: new Date(),
+                }
+              : char
+          ),
+        }))
+
+        return hpRecovered
+      },
+
+      addRestEvent: event => {
+        set(state => ({
+          restEvents: [...state.restEvents, event],
+        }))
+      },
+
+      getRestHistory: () => {
+        const { restEvents } = get()
+        return restEvents.sort(
+          (a, b) => b.startTime.getTime() - a.startTime.getTime()
+        )
+      },
+
+      getRestEventsByCharacter: characterId => {
+        const { restEvents } = get()
+        return restEvents
+          .filter(event => event.participantIds.includes(characterId))
+          .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
+      },
+
       setInitiatives: initiatives => {
         set({ initiatives })
       },
@@ -909,6 +1164,8 @@ export const useSessionStore = create<SessionState>()(
         // Initialize taxonomies if they don't exist
         const store = useSessionStore.getState()
         store.initializeTaxonomies()
+        // Migrate existing characters to support rest system
+        store.migrateCharactersForRest()
       },
     }
   )

@@ -94,10 +94,20 @@ function extractSerializableData(state: any): any {
     'lore',
     'eras',
     'npcs',
+    'backgrounds',
+    'races',
+    'npcTypes',
+    'npcImportance',
+    'traits',
+    'ideals',
+    'bonds',
+    'flaws',
+    'mannerisms',
     'quests',
     'factions',
     'maps',
     'taxonomies',
+    'restEvents',
   ]
 
   for (const key of dataKeys) {
