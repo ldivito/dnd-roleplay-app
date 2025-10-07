@@ -79,6 +79,11 @@ interface SessionState extends PersistState {
   pauseSession: () => void
   endSession: () => void
 
+  createCampaign: (
+    campaign: Omit<Campaign, 'id' | 'createdAt' | 'updatedAt'>
+  ) => void
+  updateCampaign: (campaignId: string, updates: Partial<Campaign>) => void
+
   addCharacter: (character: Character) => void
   updateCharacter: (characterId: string, updates: Partial<Character>) => void
   removeCharacter: (characterId: string) => void
@@ -296,6 +301,29 @@ export const useSessionStore = create<SessionState>()(
               ...currentSession,
               status: 'completed',
               endTime: new Date(),
+              updatedAt: new Date(),
+            },
+          })
+        }
+      },
+
+      createCampaign: campaignData => {
+        const campaign: Campaign = {
+          ...campaignData,
+          id: crypto.randomUUID(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+        set({ currentCampaign: campaign })
+      },
+
+      updateCampaign: (campaignId, updates) => {
+        const { currentCampaign } = get()
+        if (currentCampaign && currentCampaign.id === campaignId) {
+          set({
+            currentCampaign: {
+              ...currentCampaign,
+              ...updates,
               updatedAt: new Date(),
             },
           })

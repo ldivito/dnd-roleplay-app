@@ -79,6 +79,13 @@ const navigationCategories: NavCategory[] = [
         keywords: ['dashboard', 'inicio', 'home', 'panel'],
       },
       {
+        title: 'Campaña',
+        href: '/campaign',
+        icon: Crown,
+        description: 'Configuración principal de campaña',
+        keywords: ['campaign', 'config', 'setup', 'campaña'],
+      },
+      {
         title: 'Sesión Activa',
         href: '/session',
         icon: Crown,
@@ -152,7 +159,6 @@ const navigationCategories: NavCategory[] = [
         icon: Calendar,
         description: 'Sistema de calendario personalizado',
         keywords: ['calendar', 'time', 'dates', 'events'],
-        isNew: true,
       },
       {
         title: 'Misiones',
