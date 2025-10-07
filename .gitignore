@@ -36,6 +36,7 @@ yarn-error.log*
 next-env.d.ts
 
 # claude
+.claude/*
 claude.md
 CLAUDE.json
 cc.json

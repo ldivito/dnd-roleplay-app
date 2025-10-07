@@ -97,6 +97,7 @@ function extractSerializableData(state: any): any {
     'quests',
     'factions',
     'maps',
+    'taxonomies',
   ]
 
   for (const key of dataKeys) {

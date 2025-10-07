@@ -30,6 +30,8 @@ import {
 import type { Quest } from '@/types/quest'
 import type { Faction } from '@/types/faction'
 import type { LocationMap } from '@/types/map'
+import type { Taxonomy, TaxonomyCategory } from '@/types/taxonomy'
+import { DEFAULT_TAXONOMIES } from '@/types/taxonomy'
 
 interface SessionState extends PersistState {
   currentSession: Session | null
@@ -55,6 +57,7 @@ interface SessionState extends PersistState {
   quests: Quest[]
   factions: Faction[]
   maps: LocationMap[]
+  taxonomies: Taxonomy[]
 
   // Actions
   createSession: (
@@ -160,6 +163,17 @@ interface SessionState extends PersistState {
   getMapsByLocation: (locationId: string) => LocationMap[]
   getMapById: (mapId: string) => LocationMap | undefined
 
+  addTaxonomy: (taxonomy: Taxonomy) => void
+  updateTaxonomy: (taxonomyId: string, updates: Partial<Taxonomy>) => void
+  removeTaxonomy: (taxonomyId: string) => void
+  getTaxonomiesByCategory: (category: TaxonomyCategory) => Taxonomy[]
+  getTaxonomyById: (taxonomyId: string) => Taxonomy | undefined
+  getTaxonomyByName: (
+    category: TaxonomyCategory,
+    name: string
+  ) => Taxonomy | undefined
+  initializeTaxonomies: () => void
+
   setInitiatives: (initiatives: Initiative[]) => void
   addDiceRoll: (roll: DiceRoll) => void
   clearDiceHistory: () => void
@@ -193,6 +207,7 @@ export const useSessionStore = create<SessionState>()(
       quests: [],
       factions: [],
       maps: [],
+      taxonomies: [],
 
       createSession: sessionData => {
         const session: Session = {
@@ -804,6 +819,74 @@ export const useSessionStore = create<SessionState>()(
         return maps.find(map => map.id === mapId)
       },
 
+      // Taxonomy operations
+      addTaxonomy: taxonomy => {
+        set(state => ({
+          taxonomies: [...state.taxonomies, taxonomy],
+        }))
+      },
+
+      updateTaxonomy: (taxonomyId, updates) => {
+        set(state => ({
+          taxonomies: state.taxonomies.map(taxonomy =>
+            taxonomy.id === taxonomyId
+              ? { ...taxonomy, ...updates, updatedAt: new Date() }
+              : taxonomy
+          ),
+        }))
+      },
+
+      removeTaxonomy: taxonomyId => {
+        set(state => ({
+          taxonomies: state.taxonomies.filter(
+            taxonomy => taxonomy.id !== taxonomyId
+          ),
+        }))
+      },
+
+      getTaxonomiesByCategory: category => {
+        const { taxonomies } = get()
+        return taxonomies
+          .filter(taxonomy => taxonomy.category === category)
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+      },
+
+      getTaxonomyById: taxonomyId => {
+        const { taxonomies } = get()
+        return taxonomies.find(taxonomy => taxonomy.id === taxonomyId)
+      },
+
+      getTaxonomyByName: (category, name) => {
+        const { taxonomies } = get()
+        return taxonomies.find(
+          taxonomy =>
+            taxonomy.category === category &&
+            taxonomy.name.toLowerCase() === name.toLowerCase()
+        )
+      },
+
+      initializeTaxonomies: () => {
+        const { taxonomies } = get()
+
+        // Only initialize if taxonomies array is empty
+        if (taxonomies.length === 0) {
+          const initialTaxonomies: Taxonomy[] = DEFAULT_TAXONOMIES.map(
+            taxonomy => ({
+              ...taxonomy,
+              id: crypto.randomUUID(),
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            })
+          )
+          set({ taxonomies: initialTaxonomies })
+          console.log(
+            'Initialized',
+            initialTaxonomies.length,
+            'default taxonomies'
+          )
+        }
+      },
+
       setInitiatives: initiatives => {
         set({ initiatives })
       },
@@ -823,6 +906,9 @@ export const useSessionStore = create<SessionState>()(
       version: '1.0.0',
       onRehydrateStorage: () => {
         console.log('Session store rehydrated from IndexedDB')
+        // Initialize taxonomies if they don't exist
+        const store = useSessionStore.getState()
+        store.initializeTaxonomies()
       },
     }
   )

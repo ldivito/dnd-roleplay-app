@@ -25,5 +25,57 @@
       "Bash(npm run typecheck:*)"
     ],
     "deny": []
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bun x ccusage statusline --visual-burn-rate emoji",
+    "padding": 0
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.cc-notifier/cc-notifier init"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.cc-notifier/cc-notifier notify"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.cc-notifier/cc-notifier notify"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.cc-notifier/cc-notifier cleanup"
+          }
+        ]
+      }
+    ]
+  },
+  "outputStyle": "Explanatory"
 }

@@ -35,6 +35,10 @@ import {
   PenTool,
   Archive,
   Wrench,
+  Grid,
+  Gem,
+  Coins,
+  ShieldCheck,
 } from 'lucide-react'
 
 interface NavItem {
@@ -45,6 +49,7 @@ interface NavItem {
   keywords?: string[]
   badge?: string
   isNew?: boolean
+  children?: NavItem[] // Support for nested items
 }
 
 interface NavCategory {
@@ -198,6 +203,71 @@ const navigationCategories: NavCategory[] = [
         icon: Package,
         description: 'Equipo y objetos mágicos',
         keywords: ['items', 'equipment', 'gear', 'magic items'],
+        children: [
+          {
+            title: 'Tipos',
+            href: '/compendium/items/taxonomies/ItemType',
+            icon: Package,
+            description: 'Gestionar tipos de objetos',
+            keywords: ['types', 'categories'],
+          },
+          {
+            title: 'Rarezas',
+            href: '/compendium/items/taxonomies/ItemRarity',
+            icon: Star,
+            description: 'Gestionar rarezas de objetos',
+            keywords: ['rarity', 'quality'],
+          },
+          {
+            title: 'Tipos de Daño',
+            href: '/compendium/items/taxonomies/DamageType',
+            icon: Zap,
+            description: 'Gestionar tipos de daño',
+            keywords: ['damage', 'combat'],
+          },
+          {
+            title: 'Ranuras de Equipo',
+            href: '/compendium/items/taxonomies/EquipmentSlot',
+            icon: Grid,
+            description: 'Gestionar ranuras de equipamiento',
+            keywords: ['slots', 'equipment'],
+          },
+          {
+            title: 'Materiales Especiales',
+            href: '/compendium/items/taxonomies/SpecialMaterial',
+            icon: Gem,
+            description: 'Gestionar materiales especiales',
+            keywords: ['materials', 'special'],
+          },
+          {
+            title: 'Monedas',
+            href: '/compendium/items/taxonomies/Currency',
+            icon: Coins,
+            description: 'Gestionar tipos de moneda',
+            keywords: ['currency', 'money', 'gold'],
+          },
+          {
+            title: 'Tipos de Arma',
+            href: '/compendium/items/taxonomies/WeaponType',
+            icon: Sword,
+            description: 'Gestionar tipos de armas',
+            keywords: ['weapon', 'arms'],
+          },
+          {
+            title: 'Tipos de Armadura',
+            href: '/compendium/items/taxonomies/ArmorType',
+            icon: Shield,
+            description: 'Gestionar tipos de armadura',
+            keywords: ['armor', 'protection'],
+          },
+          {
+            title: 'Tipos de Resistencia',
+            href: '/compendium/items/taxonomies/ResistanceType',
+            icon: ShieldCheck,
+            description: 'Gestionar tipos de resistencia',
+            keywords: ['resistance', 'immunity'],
+          },
+        ],
       },
     ],
   },
@@ -226,10 +296,14 @@ const navigationCategories: NavCategory[] = [
   },
 ]
 
-// Flatten all items for search
-const allNavigationItems: NavItem[] = navigationCategories.flatMap(
-  category => category.items
-)
+// Flatten all items for search (including nested children)
+const allNavigationItems: NavItem[] = navigationCategories.flatMap(category => {
+  const flattenItem = (item: NavItem): NavItem[] => {
+    if (!item.children) return [item]
+    return [item, ...item.children.flatMap(flattenItem)]
+  }
+  return category.items.flatMap(flattenItem)
+})
 
 interface SidebarProps {
   className?: string
@@ -241,6 +315,129 @@ interface CollapsibleCategoryProps {
   isExpanded: boolean
   onToggle: () => void
   searchQuery: string
+}
+
+interface NavItemProps {
+  item: NavItem
+  pathname: string
+  depth?: number
+}
+
+function NavItemWithChildren({ item, pathname, depth = 0 }: NavItemProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const Icon = item.icon
+  const hasChildren = item.children && item.children.length > 0
+
+  const isActive =
+    pathname === item.href ||
+    (hasChildren && item.children?.some(child => pathname === child.href))
+
+  if (!hasChildren) {
+    return (
+      <Button
+        key={item.href}
+        variant={pathname === item.href ? 'secondary' : 'ghost'}
+        className={cn(
+          'w-full justify-start gap-2 h-8 text-sm',
+          depth === 0 ? 'pl-4' : 'pl-8',
+          pathname === item.href && 'bg-secondary'
+        )}
+        asChild
+      >
+        <Link href={item.href}>
+          <Icon className="h-3.5 w-3.5" />
+          <span className="flex-1 text-left">{item.title}</span>
+          {item.badge && (
+            <Badge variant="secondary" className="h-4 text-xs px-1.5">
+              {item.badge}
+            </Badge>
+          )}
+          {item.isNew && (
+            <Badge
+              variant="default"
+              className="h-4 text-xs px-1.5 bg-green-500"
+            >
+              New
+            </Badge>
+          )}
+        </Link>
+      </Button>
+    )
+  }
+
+  return (
+    <div>
+      <div className="flex items-center gap-1">
+        <Button
+          variant={pathname === item.href ? 'secondary' : 'ghost'}
+          className={cn(
+            'flex-1 justify-start gap-2 h-8 text-sm',
+            depth === 0 ? 'pl-4' : 'pl-8',
+            pathname === item.href && 'bg-secondary'
+          )}
+          asChild
+        >
+          <Link href={item.href}>
+            <Icon className="h-3.5 w-3.5" />
+            <span className="flex-1 text-left">{item.title}</span>
+            {item.badge && (
+              <Badge variant="secondary" className="h-4 text-xs px-1.5">
+                {item.badge}
+              </Badge>
+            )}
+            {item.isNew && (
+              <Badge
+                variant="default"
+                className="h-4 text-xs px-1.5 bg-green-500"
+              >
+                New
+              </Badge>
+            )}
+          </Link>
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 hover:bg-secondary"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? (
+            <ChevronDown className="h-3 w-3" />
+          ) : (
+            <ChevronRight className="h-3 w-3" />
+          )}
+        </Button>
+      </div>
+      {isExpanded && item.children && (
+        <div className="mt-1 space-y-1">
+          {/* Show parent link first */}
+          <Button
+            variant={pathname === item.href ? 'secondary' : 'ghost'}
+            className={cn(
+              'w-full justify-start gap-2 h-8 text-sm',
+              depth === 0 ? 'pl-8' : 'pl-12',
+              pathname === item.href && 'bg-secondary'
+            )}
+            asChild
+          >
+            <Link href={item.href}>
+              <Icon className="h-3.5 w-3.5" />
+              <span className="flex-1 text-left">Ver todos</span>
+            </Link>
+          </Button>
+          {/* Then show children */}
+          {item.children.map(child => (
+            <NavItemWithChildren
+              key={child.href}
+              item={child}
+              pathname={pathname}
+              depth={depth + 1}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 function CollapsibleCategory({
@@ -255,7 +452,8 @@ function CollapsibleCategory({
     item =>
       pathname === item.href ||
       (item.href === '/settings/database' &&
-        pathname.startsWith('/settings/database'))
+        pathname.startsWith('/settings/database')) ||
+      (item.children && item.children.some(child => pathname === child.href))
   )
 
   const filteredItems = useMemo(() => {
@@ -300,43 +498,13 @@ function CollapsibleCategory({
 
       {(isExpanded || searchQuery) && (
         <div className="mt-1 space-y-1 ml-1">
-          {filteredItems.map(item => {
-            const Icon = item.icon
-            const isActive =
-              pathname === item.href ||
-              (item.href === '/settings/database' &&
-                pathname.startsWith('/settings/database'))
-
-            return (
-              <Button
-                key={item.href}
-                variant={isActive ? 'secondary' : 'ghost'}
-                className={cn(
-                  'w-full justify-start gap-2 h-8 text-sm pl-4',
-                  isActive && 'bg-secondary'
-                )}
-                asChild
-              >
-                <Link href={item.href}>
-                  <Icon className="h-3.5 w-3.5" />
-                  <span className="flex-1 text-left">{item.title}</span>
-                  {item.badge && (
-                    <Badge variant="secondary" className="h-4 text-xs px-1.5">
-                      {item.badge}
-                    </Badge>
-                  )}
-                  {item.isNew && (
-                    <Badge
-                      variant="default"
-                      className="h-4 text-xs px-1.5 bg-green-500"
-                    >
-                      New
-                    </Badge>
-                  )}
-                </Link>
-              </Button>
-            )
-          })}
+          {filteredItems.map(item => (
+            <NavItemWithChildren
+              key={item.href}
+              item={item}
+              pathname={pathname}
+            />
+          ))}
         </div>
       )}
     </div>
