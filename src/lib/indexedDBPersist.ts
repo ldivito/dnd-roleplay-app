@@ -88,7 +88,7 @@ function extractSerializableData(state: any): any {
     'characters',
     'initiatives',
     'diceHistory',
-    'spells',
+    'songs',
     'items',
     'locations',
     'lore',

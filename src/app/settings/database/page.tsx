@@ -83,7 +83,7 @@ export default function DatabaseDebugPage() {
       data: sessionState.characters,
       icon: Users,
     },
-    { value: 'spells', label: 'Spells', data: sessionState.spells, icon: Zap },
+    { value: 'songs', label: 'Canciones', data: sessionState.songs, icon: Zap },
     { value: 'items', label: 'Items', data: sessionState.items, icon: Package },
     {
       value: 'locations',
@@ -156,9 +156,9 @@ export default function DatabaseDebugPage() {
       color: 'text-blue-600',
     },
     {
-      name: 'Spells',
-      count: sessionState.spells.length,
-      size: getArraySize(sessionState.spells),
+      name: 'Canciones',
+      count: sessionState.songs.length,
+      size: getArraySize(sessionState.songs),
       icon: Zap,
       color: 'text-purple-600',
     },

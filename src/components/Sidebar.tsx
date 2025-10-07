@@ -39,6 +39,7 @@ import {
   Gem,
   Coins,
   ShieldCheck,
+  Sparkles,
 } from 'lucide-react'
 
 interface NavItem {
@@ -191,11 +192,69 @@ const navigationCategories: NavCategory[] = [
         keywords: ['compendium', 'library', 'reference'],
       },
       {
-        title: 'Hechizos',
-        href: '/compendium/spells',
+        title: 'Canciones',
+        href: '/compendium/songs',
         icon: Zap,
-        description: 'Biblioteca de hechizos',
-        keywords: ['spells', 'magic', 'arcane'],
+        description: 'Biblioteca de canciones',
+        keywords: ['songs', 'music', 'canciones', 'musical'],
+        children: [
+          {
+            title: 'Escuelas',
+            href: '/compendium/songs/taxonomies/SongSchool',
+            icon: Star,
+            description: 'Gestionar escuelas de canción',
+            keywords: ['schools', 'magic', 'schools'],
+          },
+          {
+            title: 'Instrumentos',
+            href: '/compendium/songs/taxonomies/InstrumentType',
+            icon: Package,
+            description: 'Gestionar tipos de instrumento',
+            keywords: ['instrument', 'music'],
+          },
+          {
+            title: 'Géneros',
+            href: '/compendium/songs/taxonomies/MusicGenre',
+            icon: Star,
+            description: 'Gestionar géneros musicales',
+            keywords: ['genre', 'style'],
+          },
+          {
+            title: 'Componentes',
+            href: '/compendium/songs/taxonomies/SongComponent',
+            icon: Grid,
+            description: 'Gestionar componentes de canción',
+            keywords: ['components', 'requirements'],
+          },
+          {
+            title: 'Calidades',
+            href: '/compendium/songs/taxonomies/PerformanceQuality',
+            icon: Star,
+            description: 'Gestionar calidades de interpretación',
+            keywords: ['quality', 'performance'],
+          },
+          {
+            title: 'Alcances',
+            href: '/compendium/songs/taxonomies/SongRange',
+            icon: Target,
+            description: 'Gestionar alcances de canción',
+            keywords: ['range', 'distance'],
+          },
+          {
+            title: 'Duraciones',
+            href: '/compendium/songs/taxonomies/SongDuration',
+            icon: Clock,
+            description: 'Gestionar duraciones de canción',
+            keywords: ['duration', 'time'],
+          },
+          {
+            title: 'Propiedades',
+            href: '/compendium/songs/taxonomies/SongProperty',
+            icon: Sparkles,
+            description: 'Gestionar propiedades de canción',
+            keywords: ['properties', 'special'],
+          },
+        ],
       },
       {
         title: 'Objetos',

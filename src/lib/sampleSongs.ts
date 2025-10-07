@@ -1,7 +1,7 @@
-import { type Spell } from '@/types/spell'
+import { type Song } from '@/types/song'
 
-export const SAMPLE_MUSIC_SPELLS: Omit<
-  Spell,
+export const SAMPLE_MUSIC_SONGS: Omit<
+  Song,
   'id' | 'createdAt' | 'updatedAt'
 >[] = [
   {
@@ -19,7 +19,7 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
     description:
       'Tocas una suave melodía que restaura la vitalidad de tus aliados. Todas las criaturas amigas en un radio de 30 pies recuperan 1d4 + tu modificador de Carisma puntos de vida.',
     higherLevels:
-      'Cuando lanzas este hechizo usando un espacio de hechizo de nivel 2 o superior, la curación aumenta en 1d4 por cada nivel por encima del 1.',
+      'Cuando lanzas esta canción usando un espacio de hechizo de nivel 2 o superior, la curación aumenta en 1d4 por cada nivel por encima del 1.',
     classes: ['Bardo'],
     ritual: false,
     concentration: false,
@@ -34,7 +34,7 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
       additionalInstruments: [],
     },
     performanceEffects: {
-      poor: 'El hechizo falla. El intérprete sufre 1d4 de daño psíquico por la disonancia.',
+      poor: 'La canción falla. El intérprete sufre 1d4 de daño psíquico por la disonancia.',
       adequate: 'Las criaturas amigas recuperan 1d4 puntos de vida.',
       good: 'Las criaturas amigas recuperan 1d4 + modificador de Carisma puntos de vida.',
       excellent:
@@ -42,6 +42,8 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
       masterful:
         'Las criaturas amigas recuperan el máximo (4 + modificador de Carisma) puntos de vida, obtienen ventaja en su próxima tirada de salvación y son inmunes al miedo durante 1 minuto.',
     },
+    songProperties: [],
+    loreIds: [],
   },
   {
     name: 'Rugido de Guerra',
@@ -58,7 +60,7 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
     description:
       'Emites un rugido musical discordante que infunde terror en tus enemigos. Todas las criaturas hostiles en un cono de 60 pies deben realizar una tirada de salvación de Sabiduría o quedan asustadas durante la duración.',
     higherLevels:
-      'Cuando lanzas este hechizo usando un espacio de hechizo de nivel 3 o superior, el cono se extiende 15 pies adicionales por cada nivel por encima del 2.',
+      'Cuando lanzas esta canción usando un espacio de hechizo de nivel 3 o superior, el cono se extiende 15 pies adicionales por cada nivel por encima del 2.',
     classes: ['Bardo'],
     ritual: false,
     concentration: true,
@@ -82,6 +84,8 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
       masterful:
         'Los enemigos en el cono deben realizar tiradas de salvación de Sabiduría (DC 15) o quedar asustados durante 1 minuto. Los asustados tienen desventaja en tiradas de ataque y no pueden acercarse voluntariamente a ti.',
     },
+    songProperties: [],
+    loreIds: [],
   },
   {
     name: 'Sinfonía de Transformación',
@@ -99,7 +103,7 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
     description:
       'Mediante una compleja sinfonía, alteras la estructura molecular de un objeto no mágico que no sea más grande que un cubo de 3 pies. Puedes cambiar su forma, material o propiedades básicas.',
     higherLevels:
-      'Cuando lanzas este hechizo usando un espacio de hechizo de nivel 5 o superior, el tamaño máximo del objeto aumenta en un cubo de 1 pie por cada nivel por encima del 4.',
+      'Cuando lanzas esta canción usando un espacio de hechizo de nivel 5 o superior, el tamaño máximo del objeto aumenta en un cubo de 1 pie por cada nivel por encima del 4.',
     classes: ['Bardo'],
     ritual: true,
     concentration: false,
@@ -123,6 +127,8 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
       masterful:
         'La transformación es perfecta, el objeto obtiene propiedades beneficiosas adicionales y la duración se duplica.',
     },
+    songProperties: [],
+    loreIds: [],
   },
   {
     name: 'Canción del Viento Susurrante',
@@ -161,6 +167,8 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
       masterful:
         'Puedes comunicarte telepáticamente con hasta 5 criaturas durante 10 minutos. Todas pueden responder y comunicarse entre sí a través de ti.',
     },
+    songProperties: [],
+    loreIds: [],
   },
   {
     name: 'Marcha del Valor Inquebrantable',
@@ -177,7 +185,7 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
     description:
       'Tocas una marcha inspiradora que infunde valor y determinación en tus aliados. Hasta 6 criaturas amigas en el alcance obtienen ventaja en tiradas de salvación contra el miedo y +2 a las tiradas de ataque.',
     higherLevels:
-      'Cuando lanzas este hechizo usando un espacio de hechizo de nivel 4 o superior, puedes afectar 2 criaturas adicionales por cada nivel por encima del 3.',
+      'Cuando lanzas esta canción usando un espacio de hechizo de nivel 4 o superior, puedes afectar 2 criaturas adicionales por cada nivel por encima del 3.',
     classes: ['Bardo'],
     ritual: false,
     concentration: true,
@@ -201,6 +209,8 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
       masterful:
         'Los aliados obtienen ventaja en tiradas de salvación contra el miedo, +2 a las tiradas de ataque, y velocidad de movimiento +10 pies durante 10 minutos.',
     },
+    songProperties: [],
+    loreIds: [],
   },
   {
     name: 'Lamento de las Almas Perdidas',
@@ -219,7 +229,7 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
     description:
       'Entonas un lamento que resuena con las almas perdidas. Todas las criaturas en un radio de 60 pies deben realizar una tirada de salvación de Sabiduría. Las que fallan sufren 4d8 de daño psíquico y quedan hechizadas. Mientras estén hechizadas, se mueven a la mitad de velocidad y tienen desventaja en todas las tiradas.',
     higherLevels:
-      'Cuando lanzas este hechizo usando un espacio de hechizo de nivel 6 o superior, el daño aumenta en 1d8 por cada nivel por encima del 5.',
+      'Cuando lanzas esta canción usando un espacio de hechizo de nivel 6 o superior, el daño aumenta en 1d8 por cada nivel por encima del 5.',
     classes: ['Bardo'],
     ritual: false,
     concentration: true,
@@ -234,7 +244,7 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
       additionalInstruments: [],
     },
     performanceEffects: {
-      poor: 'El lamento te consume. Sufres el efecto completo del hechizo.',
+      poor: 'El lamento te consume. Sufres el efecto completo de la canción.',
       adequate:
         'Los enemigos deben realizar tiradas de salvación de Sabiduría (DC 15) o sufrir 3d8 de daño psíquico.',
       good: 'Los enemigos deben realizar tiradas de salvación de Sabiduría (DC 16) o sufrir 4d8 de daño psíquico y quedar hechizados.',
@@ -243,12 +253,14 @@ export const SAMPLE_MUSIC_SPELLS: Omit<
       masterful:
         'Los enemigos deben realizar tiradas de salvación de Sabiduría (DC 18) o sufrir 5d8 de daño psíquico y quedar hechizados. Los aliados obtienen resistencia al daño psíquico durante 1 hora.',
     },
+    songProperties: [],
+    loreIds: [],
   },
 ]
 
-export function getSampleSpellsWithIds(): Spell[] {
-  return SAMPLE_MUSIC_SPELLS.map(spell => ({
-    ...spell,
+export function getSampleSongsWithIds(): Song[] {
+  return SAMPLE_MUSIC_SONGS.map(song => ({
+    ...song,
     id: crypto.randomUUID(),
     createdAt: new Date(),
     updatedAt: new Date(),

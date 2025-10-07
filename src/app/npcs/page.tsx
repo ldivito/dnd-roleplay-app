@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -74,7 +74,7 @@ import MultiTaxonomySelector from '@/components/MultiTaxonomySelector'
 
 type NPCFormData = Omit<NPC, 'id' | 'createdAt' | 'updatedAt'>
 
-export default function NPCsPage() {
+function NPCsPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const {
@@ -1682,5 +1682,13 @@ export default function NPCsPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function NPCsPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Cargando...</div>}>
+      <NPCsPageContent />
+    </Suspense>
   )
 }

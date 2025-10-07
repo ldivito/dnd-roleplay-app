@@ -25,22 +25,22 @@ import {
   XCircle,
 } from 'lucide-react'
 import {
-  type Spell,
+  type Song,
   type PerformanceQuality,
   PERFORMANCE_QUALITIES,
   INSTRUMENT_CATEGORIES,
   MUSIC_GENRES,
-} from '@/types/spell'
+} from '@/types/song'
 
 interface MusicPerformanceDialogProps {
-  spell: Spell
+  song: Song
   isOpen: boolean
   onClose: () => void
   onPerformanceComplete?: (result: PerformanceResult) => void
 }
 
 interface PerformanceResult {
-  spell: Spell
+  song: Song
   performanceRoll: number
   quality: PerformanceQuality
   success: boolean
@@ -50,7 +50,7 @@ interface PerformanceResult {
 }
 
 export default function MusicPerformanceDialog({
-  spell,
+  song,
   isOpen,
   onClose,
   onPerformanceComplete,
@@ -63,11 +63,11 @@ export default function MusicPerformanceDialog({
     useState<PerformanceResult | null>(null)
   const [notes, setNotes] = useState<string>('')
 
-  if (!spell.isMusicBased || !spell.musicalComponents) {
+  if (!song.isMusicBased || !song.musicalComponents) {
     return null
   }
 
-  const { musicalComponents } = spell
+  const { musicalComponents } = song
   const totalRoll = performanceRoll + performanceBonus
   const requiredDuration = musicalComponents.duration
   const difficulty = musicalComponents.difficulty
@@ -96,8 +96,8 @@ export default function MusicPerformanceDialog({
   }
 
   const getSpellEffect = (quality: PerformanceQuality): string => {
-    if (spell.performanceEffects?.[quality]) {
-      return spell.performanceEffects[quality]
+    if (song.performanceEffects?.[quality]) {
+      return song.performanceEffects[quality]
     }
 
     // Default effects based on quality
@@ -126,7 +126,7 @@ export default function MusicPerformanceDialog({
     const criticalFailure = roll === 1
 
     const result: PerformanceResult = {
-      spell,
+      song,
       performanceRoll: roll,
       quality,
       success,
@@ -181,7 +181,7 @@ export default function MusicPerformanceDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Music className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            <span>Interpretación Musical: {spell.name}</span>
+            <span>Interpretación Musical: {song.name}</span>
           </DialogTitle>
         </DialogHeader>
 

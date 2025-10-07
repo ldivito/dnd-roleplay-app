@@ -3,7 +3,7 @@ import { createIndexedDBPersist, PersistState } from '@/lib/indexedDBPersist'
 import type { Session, Campaign } from '@/types/session'
 import type { Character } from '@/types/character'
 import type { DiceRoll, Initiative } from '@/types/dice'
-import type { Spell } from '@/types/spell'
+import type { Song } from '@/types/song'
 import type { Item } from '@/types/item'
 import type { AnyLocation, LocationType } from '@/types/location'
 import type { Lore, Era } from '@/types/lore'
@@ -39,7 +39,7 @@ interface SessionState extends PersistState {
   characters: Character[]
   initiatives: Initiative[]
   diceHistory: DiceRoll[]
-  spells: Spell[]
+  songs: Song[]
   items: Item[]
   locations: AnyLocation[]
   lore: Lore[]
@@ -72,9 +72,9 @@ interface SessionState extends PersistState {
   updateCharacter: (characterId: string, updates: Partial<Character>) => void
   removeCharacter: (characterId: string) => void
 
-  addSpell: (spell: Spell) => void
-  updateSpell: (spellId: string, updates: Partial<Spell>) => void
-  removeSpell: (spellId: string) => void
+  addSong: (song: Song) => void
+  updateSong: (songId: string, updates: Partial<Song>) => void
+  removeSong: (songId: string) => void
 
   addItem: (item: Item) => void
   updateItem: (itemId: string, updates: Partial<Item>) => void
@@ -189,7 +189,7 @@ export const useSessionStore = create<SessionState>()(
       characters: [],
       initiatives: [],
       diceHistory: [],
-      spells: [],
+      songs: [],
       items: [],
       locations: [],
       lore: [],
@@ -295,25 +295,25 @@ export const useSessionStore = create<SessionState>()(
         }))
       },
 
-      addSpell: spell => {
+      addSong: song => {
         set(state => ({
-          spells: [...state.spells, spell],
+          songs: [...state.songs, song],
         }))
       },
 
-      updateSpell: (spellId, updates) => {
+      updateSong: (songId, updates) => {
         set(state => ({
-          spells: state.spells.map(spell =>
-            spell.id === spellId
-              ? { ...spell, ...updates, updatedAt: new Date() }
-              : spell
+          songs: state.songs.map(song =>
+            song.id === songId
+              ? { ...song, ...updates, updatedAt: new Date() }
+              : song
           ),
         }))
       },
 
-      removeSpell: spellId => {
+      removeSong: songId => {
         set(state => ({
-          spells: state.spells.filter(spell => spell.id !== spellId),
+          songs: state.songs.filter(song => song.id !== songId),
         }))
       },
 

@@ -31,7 +31,7 @@ interface EntitySelectorProps {
 }
 
 const EntitySelector: React.FC<EntitySelectorProps> = ({ type, onSelect }) => {
-  const { characters, items, spells, locations, lore } = useSessionStore()
+  const { characters, items, songs, locations, lore } = useSessionStore()
   const [searchTerm, setSearchTerm] = useState('')
 
   const getEntities = () => {
@@ -41,7 +41,7 @@ const EntitySelector: React.FC<EntitySelectorProps> = ({ type, onSelect }) => {
       case 'item':
         return items.map(i => ({ id: i.id, name: i.name }))
       case 'spell':
-        return spells.map(s => ({ id: s.id, name: s.name }))
+        return songs.map(s => ({ id: s.id, name: s.name }))
       case 'location':
         return locations.map(l => ({ id: l.id, name: l.name }))
       case 'lore':

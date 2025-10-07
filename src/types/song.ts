@@ -8,7 +8,7 @@ export const InstrumentCategorySchema = z.enum([
   'keys', // Teclas - pianos, organs, harpsichords
 ])
 
-// Musical Genres/Styles that affect spell properties
+// Musical Genres/Styles that affect song properties
 export const MusicGenreSchema = z.enum([
   'ballad', // Balada - healing, peaceful, protective
   'march', // Marcha - buffs, movement, courage
@@ -18,17 +18,17 @@ export const MusicGenreSchema = z.enum([
   'folk', // Popular - utility, everyday magic
 ])
 
-// Music Performance Quality - affects spell power
+// Music Performance Quality - affects song power
 export const PerformanceQualitySchema = z.enum([
-  'poor', // 1-5: Spell may fail or backfire
-  'adequate', // 6-10: Basic spell effect
-  'good', // 11-15: Standard spell effect
-  'excellent', // 16-20: Enhanced spell effect
+  'poor', // 1-5: Song may fail or backfire
+  'adequate', // 6-10: Basic song effect
+  'good', // 11-15: Standard song effect
+  'excellent', // 16-20: Enhanced song effect
   'masterful', // 21+: Maximum effect + bonuses
 ])
 
 // Traditional D&D Schools + Music-based schools
-export const SpellSchoolSchema = z.enum([
+export const SongSchoolSchema = z.enum([
   'Abjuración',
   'Conjuración',
   'Adivinación',
@@ -44,9 +44,9 @@ export const SpellSchoolSchema = z.enum([
   'Melodía', // Melody - charm, emotion, mind effects
 ])
 
-export const SpellLevelSchema = z.number().min(0).max(9)
+export const SongLevelSchema = z.number().min(0).max(9)
 
-export const SpellRangeSchema = z.enum([
+export const SongRangeSchema = z.enum([
   'Toque',
   'Personal',
   '30 pies',
@@ -62,7 +62,7 @@ export const SpellRangeSchema = z.enum([
   'Especial',
 ])
 
-export const SpellDurationSchema = z.enum([
+export const SongDurationSchema = z.enum([
   'Instantáneo',
   '1 acción',
   '1 acción adicional',
@@ -81,34 +81,34 @@ export const SpellDurationSchema = z.enum([
   'Permanente',
 ])
 
-// Traditional spell components
-export const SpellComponentsSchema = z.object({
+// Traditional song components
+export const SongComponentsSchema = z.object({
   verbal: z.boolean().default(false),
   somatic: z.boolean().default(false),
   material: z.boolean().default(false),
   materialDescription: z.string().optional(),
 })
 
-// Musical components for music-based spells
+// Musical components for music-based songs
 export const MusicalComponentsSchema = z.object({
   instrument: InstrumentCategorySchema,
   genre: MusicGenreSchema,
   difficulty: z.number().min(5).max(30), // DC for performance check
   duration: z.number().min(1).max(10), // rounds of performance required
   requiredProficiency: z.boolean().default(false), // requires instrument proficiency
-  additionalInstruments: z.array(InstrumentCategorySchema).default([]), // ensemble spells
+  additionalInstruments: z.array(InstrumentCategorySchema).default([]), // ensemble songs
 })
 
-// Base spell schema with optional musical components
-export const SpellSchema = z.object({
+// Base song schema with optional musical components
+export const SongSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1),
-  level: SpellLevelSchema,
-  school: SpellSchoolSchema,
+  level: SongLevelSchema,
+  school: SongSchoolSchema,
   castingTime: z.string(),
-  range: SpellRangeSchema,
-  duration: SpellDurationSchema,
-  components: SpellComponentsSchema,
+  range: SongRangeSchema,
+  duration: SongDurationSchema,
+  components: SongComponentsSchema,
   description: z.string().min(1),
   higherLevels: z.string().optional(),
   classes: z.array(z.string()).default([]),
@@ -119,8 +119,8 @@ export const SpellSchema = z.object({
   page: z.number().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  // Musical spell extensions
-  isMusicBased: z.boolean().default(false),
+  // Musical song extensions
+  isMusicBased: z.boolean().default(true), // Changed default to true since all songs are music-based
   musicalComponents: MusicalComponentsSchema.optional(),
   performanceEffects: z
     .object({
@@ -134,17 +134,23 @@ export const SpellSchema = z.object({
   instrumentSpecificEffects: z
     .record(InstrumentCategorySchema, z.string())
     .optional(),
+
+  // NEW: Dynamic song properties (from taxonomies)
+  songProperties: z.array(z.string()).default([]), // Array of property names from SongProperty taxonomy
+
+  // NEW: Lore connections
+  loreIds: z.array(z.string().uuid()).default([]), // Links to lore entries
 })
 
-export type Spell = z.infer<typeof SpellSchema>
-export type SpellSchool = z.infer<typeof SpellSchoolSchema>
-export type SpellComponents = z.infer<typeof SpellComponentsSchema>
+export type Song = z.infer<typeof SongSchema>
+export type SongSchool = z.infer<typeof SongSchoolSchema>
+export type SongComponents = z.infer<typeof SongComponentsSchema>
 export type MusicalComponents = z.infer<typeof MusicalComponentsSchema>
 export type InstrumentCategory = z.infer<typeof InstrumentCategorySchema>
 export type MusicGenre = z.infer<typeof MusicGenreSchema>
 export type PerformanceQuality = z.infer<typeof PerformanceQualitySchema>
 
-export const DND_SPELL_SCHOOLS = [
+export const DND_SONG_SCHOOLS = [
   'Abjuración',
   'Conjuración',
   'Adivinación',
@@ -159,14 +165,14 @@ export const DND_SPELL_SCHOOLS = [
   'Melodía',
 ] as const
 
-export const MUSIC_SPELL_SCHOOLS = [
+export const MUSIC_SONG_SCHOOLS = [
   'Harmonía',
   'Disonancia',
   'Resonancia',
   'Melodía',
 ] as const
 
-export const DND_SPELL_CLASSES = [
+export const DND_SONG_CLASSES = [
   'Bardo',
   'Brujo',
   'Clérigo',
@@ -205,7 +211,7 @@ export const INSTRUMENT_CATEGORIES = [
   },
 ] as const
 
-// Music genres with their spell effects
+// Music genres with their song effects
 export const MUSIC_GENRES = [
   {
     id: 'ballad' as const,
@@ -251,25 +257,25 @@ export const PERFORMANCE_QUALITIES = [
     id: 'poor' as const,
     name: 'Deficiente',
     range: '1-5',
-    effect: 'El hechizo puede fallar o tener efectos negativos',
+    effect: 'La canción puede fallar o tener efectos negativos',
   },
   {
     id: 'adequate' as const,
     name: 'Adecuado',
     range: '6-10',
-    effect: 'Efecto básico del hechizo',
+    effect: 'Efecto básico de la canción',
   },
   {
     id: 'good' as const,
     name: 'Bueno',
     range: '11-15',
-    effect: 'Efecto estándar del hechizo',
+    effect: 'Efecto estándar de la canción',
   },
   {
     id: 'excellent' as const,
     name: 'Excelente',
     range: '16-20',
-    effect: 'Efecto mejorado del hechizo',
+    effect: 'Efecto mejorado de la canción',
   },
   {
     id: 'masterful' as const,

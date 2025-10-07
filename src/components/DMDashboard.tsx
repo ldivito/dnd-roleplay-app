@@ -46,7 +46,7 @@ export default function DMDashboard() {
     locations,
     lore,
     items,
-    spells,
+    songs,
     maps,
     startSession,
     pauseSession,
@@ -390,7 +390,7 @@ export default function DMDashboard() {
                 <div className="flex gap-4 text-xs">
                   <span className="flex items-center gap-1">
                     <Zap className="h-3 w-3" />
-                    {spells.length} Hechizos
+                    {songs.length} Canciones
                   </span>
                   <span className="flex items-center gap-1">
                     <Package className="h-3 w-3" />

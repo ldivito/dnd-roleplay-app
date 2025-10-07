@@ -1,13 +1,13 @@
 import {
-  type Spell,
+  type Song,
   type PerformanceQuality,
   type InstrumentCategory,
   type MusicGenre,
   INSTRUMENT_CATEGORIES,
   MUSIC_GENRES,
-} from '@/types/spell'
+} from '@/types/song'
 
-export interface SpellEffectModifier {
+export interface SongEffectModifier {
   damageMultiplier: number
   healingMultiplier: number
   durationMultiplier: number
@@ -32,7 +32,7 @@ export interface GenreMagicalProperties {
   name: string
   description: string
   effects: string
-  spellModifiers: Partial<SpellEffectModifier>
+  songModifiers: Partial<SongEffectModifier>
   compatibleInstruments: InstrumentCategory[]
 }
 
@@ -106,7 +106,7 @@ export const MAGICAL_GENRE_PROPERTIES: GenreMagicalProperties[] = [
     name: 'Balada',
     description: 'Música suave y melódica',
     effects: 'Sanación, paz, protección, emociones positivas',
-    spellModifiers: {
+    songModifiers: {
       healingMultiplier: 1.2,
       durationMultiplier: 1.1,
       dcModifier: -1,
@@ -119,7 +119,7 @@ export const MAGICAL_GENRE_PROPERTIES: GenreMagicalProperties[] = [
     name: 'Marcha',
     description: 'Ritmo fuerte y constante',
     effects: 'Mejoras, movimiento, valor, liderazgo',
-    spellModifiers: {
+    songModifiers: {
       durationMultiplier: 1.3,
       dcModifier: 1,
       additionalEffects: [
@@ -134,7 +134,7 @@ export const MAGICAL_GENRE_PROPERTIES: GenreMagicalProperties[] = [
     name: 'Lamento',
     description: 'Música triste y melancólica',
     effects: 'Debilitamiento, miedo, tristeza, maldiciones',
-    spellModifiers: {
+    songModifiers: {
       damageMultiplier: 1.15,
       dcModifier: 2,
       additionalEffects: [
@@ -149,7 +149,7 @@ export const MAGICAL_GENRE_PROPERTIES: GenreMagicalProperties[] = [
     name: 'Batalla',
     description: 'Música agresiva y poderosa',
     effects: 'Combate, destrucción, furia, poder',
-    spellModifiers: {
+    songModifiers: {
       damageMultiplier: 1.25,
       dcModifier: 1,
       additionalEffects: [
@@ -164,7 +164,7 @@ export const MAGICAL_GENRE_PROPERTIES: GenreMagicalProperties[] = [
     name: 'Ritual',
     description: 'Música ceremonial y mística',
     effects: 'Invocación, transformación, adivinación, magia compleja',
-    spellModifiers: {
+    songModifiers: {
       durationMultiplier: 1.5,
       dcModifier: 3,
       rangeMultiplier: 1.2,
@@ -180,7 +180,7 @@ export const MAGICAL_GENRE_PROPERTIES: GenreMagicalProperties[] = [
     name: 'Popular',
     description: 'Música tradicional y sencilla',
     effects: 'Utilidad cotidiana, efectos simples, comunidad',
-    spellModifiers: {
+    songModifiers: {
       dcModifier: -2,
       additionalEffects: [
         'Facilita la interacción social',
@@ -191,13 +191,13 @@ export const MAGICAL_GENRE_PROPERTIES: GenreMagicalProperties[] = [
   },
 ]
 
-export function calculateSpellEffectModifiers(
-  spell: Spell,
+export function calculateSongEffectModifiers(
+  song: Song,
   quality: PerformanceQuality,
   instrumentCategory: InstrumentCategory,
   genre: MusicGenre
-): SpellEffectModifier {
-  const baseModifiers: SpellEffectModifier = {
+): SongEffectModifier {
+  const baseModifiers: SongEffectModifier = {
     damageMultiplier: 1,
     healingMultiplier: 1,
     durationMultiplier: 1,
@@ -211,7 +211,7 @@ export function calculateSpellEffectModifiers(
 
   // Apply genre modifiers
   const genreProperties = MAGICAL_GENRE_PROPERTIES.find(g => g.genre === genre)
-  const genreModifiers = genreProperties?.spellModifiers || {}
+  const genreModifiers = genreProperties?.songModifiers || {}
 
   // Apply instrument modifiers
   const instrumentProperties = MAGICAL_INSTRUMENT_PROPERTIES.find(
@@ -255,7 +255,7 @@ export function calculateSpellEffectModifiers(
   }
 }
 
-function getQualityModifiers(quality: PerformanceQuality): SpellEffectModifier {
+function getQualityModifiers(quality: PerformanceQuality): SongEffectModifier {
   switch (quality) {
     case 'poor':
       return {
@@ -345,12 +345,12 @@ export function getInstrumentGenreCompatibility(
   return 'poor'
 }
 
-export function generateSpellEffectDescription(
-  spell: Spell,
+export function generateSongEffectDescription(
+  song: Song,
   quality: PerformanceQuality,
-  modifiers: SpellEffectModifier
+  modifiers: SongEffectModifier
 ): string {
-  const baseEffect = spell.description
+  const baseEffect = song.description
   const qualityName = quality.charAt(0).toUpperCase() + quality.slice(1)
 
   let description = `**Interpretación ${qualityName}:**\n\n`
