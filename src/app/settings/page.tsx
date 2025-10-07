@@ -16,6 +16,11 @@ import {
   AlertTriangle,
   CheckCircle2,
   Bug,
+  Cloud,
+  CloudUpload,
+  Trash2,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react'
 import {
   exportCampaignData,
@@ -23,6 +28,16 @@ import {
   downloadCampaignBackup,
 } from '@/lib/dataManagement'
 import BackupManager from '@/components/BackupManager'
+import {
+  uploadBackupToCloud,
+  listCloudBackups,
+  restoreFromCloudBackup,
+  deleteCloudBackup,
+  downloadBackupFile,
+  formatFileSize,
+  type CloudBackupMetadata,
+} from '@/lib/cloudBackup'
+import { isSupabaseConfigured } from '@/lib/supabase'
 
 export default function SettingsPage() {
   const [importing, setImporting] = useState(false)
@@ -32,9 +47,144 @@ export default function SettingsPage() {
   } | null>(null)
   const [storageInfo, setStorageInfo] = useState({ size: '0 KB', items: 0 })
 
+  // Cloud backup state
+  const [cloudBackups, setCloudBackups] = useState<CloudBackupMetadata[]>([])
+  const [cloudLoading, setCloudLoading] = useState(false)
+  const [uploadingToCloud, setUploadingToCloud] = useState(false)
+  const [customBackupName, setCustomBackupName] = useState('')
+  const [supabaseConfigured, setSupabaseConfigured] = useState(false)
+
   useEffect(() => {
     getStorageInfo().then(setStorageInfo)
+
+    // Check if Supabase is configured
+    setSupabaseConfigured(isSupabaseConfigured())
+
+    // Load cloud backups if configured
+    if (isSupabaseConfigured()) {
+      loadCloudBackups()
+    }
   }, [])
+
+  const loadCloudBackups = async () => {
+    setCloudLoading(true)
+    try {
+      const result = await listCloudBackups()
+      if (result.success && result.backups) {
+        setCloudBackups(result.backups)
+      } else if (result.error) {
+        setMessage({ type: 'error', text: result.error })
+      }
+    } catch (error) {
+      console.error('Error loading cloud backups:', error)
+    } finally {
+      setCloudLoading(false)
+    }
+  }
+
+  const handleUploadToCloud = async () => {
+    setUploadingToCloud(true)
+    setMessage(null)
+    try {
+      const result = await uploadBackupToCloud(customBackupName || undefined)
+      if (result.success) {
+        setMessage({
+          type: 'success',
+          text: 'Copia de seguridad subida a la nube correctamente',
+        })
+        setCustomBackupName('')
+        await loadCloudBackups()
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Error desconocido' })
+      }
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: 'Error al subir la copia de seguridad',
+      })
+    } finally {
+      setUploadingToCloud(false)
+    }
+  }
+
+  const handleRestoreFromCloud = async (fileName: string) => {
+    if (
+      !confirm(
+        '¿Estás seguro de que quieres restaurar desde esta copia? Esto reemplazará todos los datos actuales y recargará la página.'
+      )
+    ) {
+      return
+    }
+
+    setCloudLoading(true)
+    setMessage(null)
+    try {
+      const result = await restoreFromCloudBackup(fileName)
+      if (result.success) {
+        setMessage({
+          type: 'success',
+          text: 'Restaurando desde la nube... Recargando página...',
+        })
+        // Reload page after a short delay to show message
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Error desconocido' })
+        setCloudLoading(false)
+      }
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: 'Error al restaurar desde la nube',
+      })
+      setCloudLoading(false)
+    }
+  }
+
+  const handleDeleteCloudBackup = async (fileName: string) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta copia?')) {
+      return
+    }
+
+    setCloudLoading(true)
+    setMessage(null)
+    try {
+      const result = await deleteCloudBackup(fileName)
+      if (result.success) {
+        setMessage({
+          type: 'success',
+          text: 'Copia de seguridad eliminada correctamente',
+        })
+        await loadCloudBackups()
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Error desconocido' })
+      }
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: 'Error al eliminar la copia de seguridad',
+      })
+    } finally {
+      setCloudLoading(false)
+    }
+  }
+
+  const handleDownloadCloudBackup = async (fileName: string) => {
+    setMessage(null)
+    try {
+      await downloadBackupFile(fileName)
+      setMessage({
+        type: 'success',
+        text: 'Copia de seguridad descargada correctamente',
+      })
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: 'Error al descargar la copia de seguridad',
+      })
+    }
+  }
 
   const handleExport = async () => {
     try {
@@ -248,6 +398,200 @@ export default function SettingsPage() {
 
       {/* Backup Management */}
       <BackupManager />
+
+      {/* Cloud Backup */}
+      {supabaseConfigured ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Cloud className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              Copias de Seguridad en la Nube
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Upload to Cloud */}
+            <div className="space-y-3">
+              <h4 className="font-medium">Subir a la Nube</h4>
+              <p className="text-sm text-muted-foreground">
+                Sube una copia de seguridad de tu campaña actual a Supabase
+                Storage.
+              </p>
+              <div className="space-y-2">
+                <Label htmlFor="backup-name">
+                  Nombre personalizado (opcional)
+                </Label>
+                <Input
+                  id="backup-name"
+                  type="text"
+                  placeholder="ej: antes-batalla-final"
+                  value={customBackupName}
+                  onChange={e => setCustomBackupName(e.target.value)}
+                  disabled={uploadingToCloud}
+                />
+              </div>
+              <Button
+                onClick={handleUploadToCloud}
+                disabled={uploadingToCloud}
+                className="w-full sm:w-auto"
+              >
+                {uploadingToCloud ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Subiendo...
+                  </>
+                ) : (
+                  <>
+                    <CloudUpload className="h-4 w-4 mr-2" />
+                    Subir a la Nube
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <Separator />
+
+            {/* Cloud Backups List */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium">Copias en la Nube</h4>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={loadCloudBackups}
+                  disabled={cloudLoading}
+                >
+                  {cloudLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+
+              {cloudLoading && cloudBackups.length === 0 ? (
+                <div className="flex items-center justify-center p-8 text-muted-foreground">
+                  <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                  Cargando copias de seguridad...
+                </div>
+              ) : cloudBackups.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground border-2 border-dashed rounded-lg">
+                  <Cloud className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>No hay copias de seguridad en la nube</p>
+                  <p className="text-sm">
+                    Sube tu primera copia usando el botón de arriba
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {cloudBackups.map(backup => (
+                    <div
+                      key={backup.fileName}
+                      className="p-4 border rounded-lg space-y-2 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h5 className="font-medium truncate">
+                            {backup.name || backup.fileName}
+                          </h5>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                            <span>{formatFileSize(backup.size)}</span>
+                            <span>•</span>
+                            <span>
+                              {backup.createdAt.toLocaleDateString('es-ES', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleRestoreFromCloud(backup.fileName)
+                            }
+                            disabled={cloudLoading}
+                            title="Restaurar desde esta copia"
+                          >
+                            <Upload className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleDownloadCloudBackup(backup.fileName)
+                            }
+                            title="Descargar archivo JSON"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleDeleteCloudBackup(backup.fileName)
+                            }
+                            disabled={cloudLoading}
+                            title="Eliminar esta copia"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-start space-x-2">
+                <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-blue-800 dark:text-blue-200">
+                    Copias en la Nube Activas
+                  </p>
+                  <p className="text-blue-700 dark:text-blue-300">
+                    Tus copias están almacenadas de forma segura en Supabase
+                    Storage. Puedes acceder a ellas desde cualquier dispositivo
+                    con las credenciales configuradas.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Cloud className="h-5 w-5 text-muted-foreground" />
+              Copias de Seguridad en la Nube
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-8 text-center border-2 border-dashed rounded-lg">
+              <Cloud className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <h4 className="font-medium mb-2">Supabase no configurado</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Para usar copias de seguridad en la nube, configura Supabase en
+                tu archivo .env.local:
+              </p>
+              <div className="text-left bg-muted p-4 rounded-lg font-mono text-xs space-y-1">
+                <div>NEXT_PUBLIC_SUPABASE_URL=tu-url-de-supabase</div>
+                <div>NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-clave-anon</div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">
+                Reinicia el servidor de desarrollo después de configurar.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Database Debug */}
       <Card>
