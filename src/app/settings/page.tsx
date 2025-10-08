@@ -21,6 +21,8 @@ import {
   Trash2,
   RefreshCw,
   Loader2,
+  User,
+  LogOut,
 } from 'lucide-react'
 import {
   exportCampaignData,
@@ -38,8 +40,10 @@ import {
   type CloudBackupMetadata,
 } from '@/lib/cloudBackup'
 import { isSupabaseConfigured } from '@/lib/supabase'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function SettingsPage() {
+  const { user, signOut } = useAuth()
   const [importing, setImporting] = useState(false)
   const [message, setMessage] = useState<{
     type: 'success' | 'error'
@@ -291,6 +295,47 @@ export default function SettingsPage() {
               >
                 {message.text}
               </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* User Profile */}
+      {user && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              Perfil de Usuario
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium">{user.email}</p>
+              </div>
+              <Badge variant="outline" className="ml-4">
+                Dungeon Master
+              </Badge>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-3">
+              <h4 className="font-medium">Sesión</h4>
+              <p className="text-sm text-muted-foreground">
+                Has iniciado sesión. Tus copias de seguridad en la nube están
+                protegidas y asociadas a tu cuenta.
+              </p>
+              <Button
+                onClick={() => signOut()}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Cerrar Sesión
+              </Button>
             </div>
           </CardContent>
         </Card>

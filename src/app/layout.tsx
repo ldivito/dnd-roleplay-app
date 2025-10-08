@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import ErrorBoundary from '@/components/ErrorBoundary'
-import AppLayout from '@/components/AppLayout'
+import { AuthProvider } from '@/contexts/AuthContext'
+import ConditionalLayout from '@/components/ConditionalLayout'
 
 export const metadata: Metadata = {
   title: 'Sesión de Rol D&D',
@@ -17,7 +18,9 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body>
         <ErrorBoundary>
-          <AppLayout>{children}</AppLayout>
+          <AuthProvider>
+            <ConditionalLayout>{children}</ConditionalLayout>
+          </AuthProvider>
         </ErrorBoundary>
       </body>
     </html>

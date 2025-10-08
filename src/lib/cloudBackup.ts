@@ -1,4 +1,9 @@
-import { supabase, isSupabaseConfigured, BACKUP_BUCKET } from './supabase'
+import {
+  supabase,
+  isSupabaseConfigured,
+  BACKUP_BUCKET,
+  getCurrentUser,
+} from './supabase'
 import { dbManager } from './indexedDB'
 
 export interface CloudBackupMetadata {
@@ -37,6 +42,15 @@ export async function uploadBackupToCloud(
       }
     }
 
+    // Get current user
+    const user = await getCurrentUser()
+    if (!user) {
+      return {
+        success: false,
+        error: 'Debes iniciar sesión para subir copias a la nube',
+      }
+    }
+
     // Get current campaign data from IndexedDB
     const CURRENT_CAMPAIGN_ID = 'current-campaign'
     const campaign = await dbManager.getCampaign(CURRENT_CAMPAIGN_ID)
@@ -48,10 +62,10 @@ export async function uploadBackupToCloud(
       }
     }
 
-    // Create filename with timestamp and optional custom name
+    // Create filename with user ID, timestamp and optional custom name
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
     const namePart = customName ? `-${sanitizeFilename(customName)}` : ''
-    const fileName = `backup-${timestamp}${namePart}.json`
+    const fileName = `${user.id}/backup-${timestamp}${namePart}.json`
 
     // Convert campaign data to JSON
     const jsonData = JSON.stringify(campaign.data, null, 2)
@@ -87,7 +101,7 @@ export async function uploadBackupToCloud(
 }
 
 /**
- * Lists all cloud backups from Supabase Storage
+ * Lists all cloud backups from Supabase Storage for the current user
  */
 export async function listCloudBackups(): Promise<CloudBackupListResult> {
   try {
@@ -98,9 +112,19 @@ export async function listCloudBackups(): Promise<CloudBackupListResult> {
       }
     }
 
+    // Get current user
+    const user = await getCurrentUser()
+    if (!user) {
+      return {
+        success: false,
+        error: 'Debes iniciar sesión para ver copias en la nube',
+      }
+    }
+
+    // List files in user's folder
     const { data, error } = await supabase.storage
       .from(BACKUP_BUCKET)
-      .list('', {
+      .list(user.id, {
         sortBy: { column: 'created_at', order: 'desc' },
       })
 
@@ -117,7 +141,7 @@ export async function listCloudBackups(): Promise<CloudBackupListResult> {
       .filter(file => file.name.endsWith('.json'))
       .map(file => ({
         name: extractBackupName(file.name),
-        fileName: file.name,
+        fileName: `${user.id}/${file.name}`, // Include user ID in path
         size: file.metadata?.size || 0,
         createdAt: new Date(file.created_at),
         lastModified: new Date(file.updated_at),
