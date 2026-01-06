@@ -108,6 +108,7 @@ function extractSerializableData(state: any): any {
     'maps',
     'taxonomies',
     'restEvents',
+    'spells',
   ]
 
   for (const key of dataKeys) {

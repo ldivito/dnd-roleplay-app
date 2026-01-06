@@ -33,6 +33,7 @@ import type { LocationMap } from '@/types/map'
 import type { Taxonomy, TaxonomyCategory } from '@/types/taxonomy'
 import { DEFAULT_TAXONOMIES } from '@/types/taxonomy'
 import type { RestEvent } from '@/types/rest'
+import type { Spell } from '@/types/spell'
 import {
   performShortRest,
   performLongRest,
@@ -69,6 +70,7 @@ interface SessionState extends PersistState {
   maps: LocationMap[]
   taxonomies: Taxonomy[]
   restEvents: RestEvent[]
+  spells: Spell[]
 
   // Actions
   createSession: (
@@ -179,6 +181,10 @@ interface SessionState extends PersistState {
   getMapsByLocation: (locationId: string) => LocationMap[]
   getMapById: (mapId: string) => LocationMap | undefined
 
+  addSpell: (spell: Spell) => void
+  updateSpell: (spellId: string, updates: Partial<Spell>) => void
+  removeSpell: (spellId: string) => void
+
   addTaxonomy: (taxonomy: Taxonomy) => void
   updateTaxonomy: (taxonomyId: string, updates: Partial<Taxonomy>) => void
   removeTaxonomy: (taxonomyId: string) => void
@@ -242,6 +248,7 @@ export const useSessionStore = create<SessionState>()(
       maps: [],
       taxonomies: [],
       restEvents: [],
+      spells: [],
 
       createSession: sessionData => {
         const session: Session = {
@@ -874,6 +881,29 @@ export const useSessionStore = create<SessionState>()(
       getMapById: mapId => {
         const { maps } = get()
         return maps.find(map => map.id === mapId)
+      },
+
+      // Spell operations
+      addSpell: spell => {
+        set(state => ({
+          spells: [...state.spells, spell],
+        }))
+      },
+
+      updateSpell: (spellId, updates) => {
+        set(state => ({
+          spells: state.spells.map(spell =>
+            spell.id === spellId
+              ? { ...spell, ...updates, updatedAt: new Date() }
+              : spell
+          ),
+        }))
+      },
+
+      removeSpell: spellId => {
+        set(state => ({
+          spells: state.spells.filter(spell => spell.id !== spellId),
+        }))
       },
 
       // Taxonomy operations

@@ -31,16 +31,21 @@ import {
   INSTRUMENT_CATEGORIES,
   MUSIC_GENRES,
 } from '@/types/song'
+import { type Spell } from '@/types/spell'
+
+// Union type for items that can be performed musically
+type MusicPerformable = Song | Spell
 
 interface MusicPerformanceDialogProps {
-  song: Song
+  song?: Song | undefined
+  spell?: Spell | undefined
   isOpen: boolean
   onClose: () => void
-  onPerformanceComplete?: (result: PerformanceResult) => void
+  onPerformanceComplete?: ((result: PerformanceResult) => void) | undefined
 }
 
 interface PerformanceResult {
-  song: Song
+  item: MusicPerformable
   performanceRoll: number
   quality: PerformanceQuality
   success: boolean
@@ -51,6 +56,7 @@ interface PerformanceResult {
 
 export default function MusicPerformanceDialog({
   song,
+  spell,
   isOpen,
   onClose,
   onPerformanceComplete,
@@ -63,11 +69,14 @@ export default function MusicPerformanceDialog({
     useState<PerformanceResult | null>(null)
   const [notes, setNotes] = useState<string>('')
 
-  if (!song.isMusicBased || !song.musicalComponents) {
+  // Use either song or spell
+  const item = song || spell
+
+  if (!item || !item.isMusicBased || !item.musicalComponents) {
     return null
   }
 
-  const { musicalComponents } = song
+  const { musicalComponents } = item
   const totalRoll = performanceRoll + performanceBonus
   const requiredDuration = musicalComponents.duration
   const difficulty = musicalComponents.difficulty
@@ -96,8 +105,8 @@ export default function MusicPerformanceDialog({
   }
 
   const getSpellEffect = (quality: PerformanceQuality): string => {
-    if (song.performanceEffects?.[quality]) {
-      return song.performanceEffects[quality]
+    if (item.performanceEffects?.[quality]) {
+      return item.performanceEffects[quality]
     }
 
     // Default effects based on quality
@@ -126,7 +135,7 @@ export default function MusicPerformanceDialog({
     const criticalFailure = roll === 1
 
     const result: PerformanceResult = {
-      song,
+      item,
       performanceRoll: roll,
       quality,
       success,
@@ -181,7 +190,7 @@ export default function MusicPerformanceDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Music className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            <span>Interpretación Musical: {song.name}</span>
+            <span>Interpretación Musical: {item.name}</span>
           </DialogTitle>
         </DialogHeader>
 
