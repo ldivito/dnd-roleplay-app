@@ -43,6 +43,7 @@ import { useSessionStore } from '@/stores/sessionStore'
 import LoreTimeline from '@/components/LoreTimeline'
 import LoreConnectionManager from '@/components/LoreConnectionManager'
 import LoreGraphView from '@/components/LoreGraphView'
+import LoreTypePreview from '@/components/LoreTypePreview'
 import type {
   Lore,
   LoreType,
@@ -107,6 +108,9 @@ export default function LorePage() {
   })
 
   const watchedConnections = watch('connections') || []
+  const watchedType = watch('type') as LoreType
+  const watchedImportance = watch('importance') as LoreImportance
+  const watchedTitle = watch('title') as string
 
   const onSubmit = (data: any) => {
     const loreData: Lore = {
@@ -243,51 +247,64 @@ export default function LorePage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="type">Tipo</Label>
-                    <Select
-                      onValueChange={value => setValue('type', value)}
-                      defaultValue="event"
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LORE_TYPES.map(type => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                  {/* Type, Importance, Author selectors */}
+                  <div className="lg:col-span-3 grid grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="type">Tipo</Label>
+                      <Select
+                        onValueChange={value => setValue('type', value)}
+                        defaultValue="event"
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LORE_TYPES.map(type => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="importance">Importancia</Label>
+                      <Select
+                        onValueChange={value => setValue('importance', value)}
+                        defaultValue="secondary"
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LORE_IMPORTANCE.map(imp => (
+                            <SelectItem key={imp.value} value={imp.value}>
+                              {imp.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <div>
-                    <Label htmlFor="importance">Importancia</Label>
-                    <Select
-                      onValueChange={value => setValue('importance', value)}
-                      defaultValue="secondary"
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LORE_IMPORTANCE.map(imp => (
-                          <SelectItem key={imp.value} value={imp.value}>
-                            {imp.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div>
+                      <Label htmlFor="author">Autor</Label>
+                      <Input
+                        id="author"
+                        {...register('author')}
+                        placeholder="Nombre del autor"
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="author">Autor</Label>
-                    <Input
-                      id="author"
-                      {...register('author')}
-                      placeholder="Nombre del autor"
+                  {/* Node Preview */}
+                  <div className="lg:col-span-1">
+                    <Label className="mb-2 block">Vista previa del nodo</Label>
+                    <LoreTypePreview
+                      type={watchedType || 'event'}
+                      importance={watchedImportance || 'secondary'}
+                      title={watchedTitle || 'Título del lore'}
                     />
                   </div>
                 </div>

@@ -36,13 +36,13 @@ export default function LoreGraphToolbar({
 }: LoreGraphToolbarProps) {
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="absolute top-4 left-4 z-10 flex flex-col gap-1 bg-white rounded-lg shadow-lg border p-1">
+      <div className="absolute top-4 left-4 z-10 flex flex-col gap-1 bg-slate-900/95 backdrop-blur-sm rounded-lg shadow-lg border border-slate-700 p-1.5">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-slate-300 hover:text-foreground hover:bg-slate-700"
               onClick={onAddNode}
             >
               <Plus className="h-4 w-4" />
@@ -53,14 +53,14 @@ export default function LoreGraphToolbar({
           </TooltipContent>
         </Tooltip>
 
-        <div className="w-full h-px bg-border my-1" />
+        <div className="w-full h-px bg-slate-700 my-1" />
 
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-slate-300 hover:text-foreground hover:bg-slate-700"
               onClick={onZoomIn}
             >
               <ZoomIn className="h-4 w-4" />
@@ -76,7 +76,7 @@ export default function LoreGraphToolbar({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-slate-300 hover:text-foreground hover:bg-slate-700"
               onClick={onZoomOut}
             >
               <ZoomOut className="h-4 w-4" />
@@ -92,7 +92,7 @@ export default function LoreGraphToolbar({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-slate-300 hover:text-foreground hover:bg-slate-700"
               onClick={onFitView}
             >
               <Maximize2 className="h-4 w-4" />
@@ -103,14 +103,14 @@ export default function LoreGraphToolbar({
           </TooltipContent>
         </Tooltip>
 
-        <div className="w-full h-px bg-border my-1" />
+        <div className="w-full h-px bg-slate-700 my-1" />
 
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-slate-300 hover:text-foreground hover:bg-slate-700"
               onClick={onAutoLayout}
             >
               <Grid3X3 className="h-4 w-4" />
@@ -126,7 +126,7 @@ export default function LoreGraphToolbar({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-slate-300 hover:text-foreground hover:bg-slate-700"
               onClick={onResetLayout}
             >
               <RotateCcw className="h-4 w-4" />

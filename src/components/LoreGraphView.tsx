@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import {
   ReactFlow,
   Background,
@@ -15,6 +15,7 @@ import {
   type Edge,
   type Connection,
   type NodeMouseHandler,
+  type EdgeMouseHandler,
   MarkerType,
   BackgroundVariant,
 } from '@xyflow/react'
@@ -22,25 +23,51 @@ import '@xyflow/react/dist/style.css'
 
 import { useSessionStore } from '@/stores/sessionStore'
 import type { Lore, LoreConnection } from '@/types/lore'
-import { getRelationshipTypeInfo } from '@/types/lore'
+import { getRelationshipTypeInfo, RELATIONSHIP_TYPES } from '@/types/lore'
 import type { LoreNodeData, LoreNodePosition } from '@/types/loreGraph'
 import LoreGraphNode from './LoreGraphNode'
 import LoreGraphToolbar from './LoreGraphToolbar'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Trash2 } from 'lucide-react'
 
 // Register custom node types
 const nodeTypes = {
   loreNode: LoreGraphNode,
 }
 
-// Default edge style
+// Default edge style - Dark theme optimized
 const defaultEdgeOptions = {
   type: 'smoothstep',
   animated: false,
-  style: { stroke: '#94a3b8', strokeWidth: 2 },
+  style: { stroke: '#64748b', strokeWidth: 2 },
   markerEnd: {
     type: MarkerType.ArrowClosed,
-    color: '#94a3b8',
+    color: '#64748b',
   },
+}
+
+interface EdgeEditState {
+  isOpen: boolean
+  sourceId: string
+  targetId: string
+  connectionId: string
+  relationshipType: string
+  description: string
 }
 
 interface LoreGraphViewInnerProps {
@@ -65,6 +92,16 @@ function LoreGraphViewInner({
   } = useSessionStore()
 
   const { fitView, zoomIn, zoomOut, getViewport } = useReactFlow()
+
+  // Edge editing state
+  const [edgeEdit, setEdgeEdit] = useState<EdgeEditState>({
+    isOpen: false,
+    sourceId: '',
+    targetId: '',
+    connectionId: '',
+    relationshipType: 'related_to',
+    description: '',
+  })
 
   // Convert lore entries to React Flow nodes
   const initialNodes = useMemo(() => {
@@ -115,9 +152,11 @@ function LoreGraphViewInner({
               source: loreItem.id,
               target: conn.entityId,
               label: relationshipInfo?.label || conn.relationshipType,
-              labelStyle: { fontSize: 10, fill: '#64748b' },
-              labelBgStyle: { fill: 'white', fillOpacity: 0.8 },
-              labelBgPadding: [4, 2] as [number, number],
+              labelStyle: { fontSize: 11, fill: '#94a3b8', fontWeight: 500 },
+              labelBgStyle: { fill: '#1e293b', fillOpacity: 0.9 },
+              labelBgPadding: [6, 4] as [number, number],
+              labelBgBorderRadius: 4,
+              data: { connectionId: conn.id },
               ...defaultEdgeOptions,
             })
           }
@@ -193,9 +232,11 @@ function LoreGraphViewInner({
             ...connection,
             id: `${connection.source}-${connection.target}`,
             label: 'Relacionado con',
-            labelStyle: { fontSize: 10, fill: '#64748b' },
-            labelBgStyle: { fill: 'white', fillOpacity: 0.8 },
-            labelBgPadding: [4, 2] as [number, number],
+            labelStyle: { fontSize: 11, fill: '#94a3b8', fontWeight: 500 },
+            labelBgStyle: { fill: '#1e293b', fillOpacity: 0.9 },
+            labelBgPadding: [6, 4] as [number, number],
+            labelBgBorderRadius: 4,
+            data: { connectionId: newConnection.id },
             ...defaultEdgeOptions,
           },
           eds
@@ -215,6 +256,67 @@ function LoreGraphViewInner({
     },
     [lore, onEditLore]
   )
+
+  // Handle edge click - open edge editor
+  const onEdgeClick: EdgeMouseHandler = useCallback(
+    (_event, edge) => {
+      const sourceLore = lore.find(l => l.id === edge.source)
+      if (!sourceLore) return
+
+      const connection = sourceLore.connections.find(
+        conn => conn.type === 'lore' && conn.entityId === edge.target
+      )
+
+      if (!connection) return
+
+      setEdgeEdit({
+        isOpen: true,
+        sourceId: edge.source,
+        targetId: edge.target,
+        connectionId: connection.id,
+        relationshipType: connection.relationshipType,
+        description: connection.description || '',
+      })
+    },
+    [lore]
+  )
+
+  // Save edge changes
+  const handleSaveEdge = useCallback(() => {
+    const sourceLore = lore.find(l => l.id === edgeEdit.sourceId)
+    if (!sourceLore) return
+
+    const updatedConnections = sourceLore.connections.map(conn => {
+      if (conn.id === edgeEdit.connectionId) {
+        const updatedConn: LoreConnection = {
+          ...conn,
+          relationshipType: edgeEdit.relationshipType as LoreConnection['relationshipType'],
+        }
+        // Only add description if it has content
+        if (edgeEdit.description) {
+          updatedConn.description = edgeEdit.description
+        }
+        return updatedConn
+      }
+      return conn
+    })
+
+    updateLore(sourceLore.id, { connections: updatedConnections })
+    setEdgeEdit(prev => ({ ...prev, isOpen: false }))
+  }, [edgeEdit, lore, updateLore])
+
+  // Delete edge/connection
+  const handleDeleteEdge = useCallback(() => {
+    const sourceLore = lore.find(l => l.id === edgeEdit.sourceId)
+    if (!sourceLore) return
+
+    const updatedConnections = sourceLore.connections.filter(
+      conn => conn.id !== edgeEdit.connectionId
+    )
+
+    updateLore(sourceLore.id, { connections: updatedConnections })
+    setEdgeEdit(prev => ({ ...prev, isOpen: false }))
+  }, [edgeEdit, lore, updateLore])
 
   // Toolbar actions
   const handleFitView = useCallback(() => {
@@ -295,8 +397,12 @@ function LoreGraphViewInner({
     return typeColors[(node.data as LoreNodeData)?.type] || '#6b7280'
   }, [])
 
+  // Get source and target names for edge dialog
+  const sourceLoreName = lore.find(l => l.id === edgeEdit.sourceId)?.title || ''
+  const targetLoreName = lore.find(l => l.id === edgeEdit.targetId)?.title || ''
+
   return (
-    <div className="w-full h-[600px] bg-slate-50 rounded-lg border relative">
+    <div className="w-full h-[600px] bg-background rounded-lg border border-border relative overflow-hidden">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -306,6 +412,7 @@ function LoreGraphViewInner({
         onNodeDragStop={onNodeDragStop}
         onMoveEnd={onMoveEnd}
         onNodeDoubleClick={onNodeDoubleClick}
+        onEdgeClick={onEdgeClick}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
         defaultViewport={loreGraphLayout.viewport}
@@ -315,15 +422,23 @@ function LoreGraphViewInner({
         maxZoom={2}
         snapToGrid
         snapGrid={[20, 20]}
-        connectionLineStyle={{ stroke: '#94a3b8', strokeWidth: 2 }}
+        connectionLineStyle={{ stroke: '#6366f1', strokeWidth: 2 }}
         attributionPosition="bottom-right"
+        className="[&_.react-flow__attribution]:text-muted-foreground/50 [&_.react-flow__attribution]:text-[10px]"
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#cbd5e1" />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={24}
+          size={2}
+          color="#334155"
+          className="!bg-slate-950"
+        />
         <Controls
           position="bottom-right"
           showZoom={false}
           showFitView={false}
           showInteractive={false}
+          className="[&_button]:!bg-slate-800 [&_button]:!border-slate-700 [&_button]:!text-slate-300 [&_button:hover]:!bg-slate-700"
         />
         <MiniMap
           nodeColor={nodeColor}
@@ -331,7 +446,8 @@ function LoreGraphViewInner({
           zoomable
           pannable
           position="bottom-left"
-          className="!bg-white/80 !border !border-slate-200 !rounded-lg !shadow-sm"
+          className="!bg-slate-900/90 !border !border-slate-700 !rounded-lg !shadow-lg"
+          maskColor="rgba(15, 23, 42, 0.7)"
         />
       </ReactFlow>
 
@@ -346,7 +462,7 @@ function LoreGraphViewInner({
 
       {/* Empty state */}
       {lore.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-50/80 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 pointer-events-none">
           <div className="text-center">
             <p className="text-muted-foreground mb-2">
               No hay entradas de Lore todavía
@@ -360,10 +476,77 @@ function LoreGraphViewInner({
 
       {/* Instructions hint */}
       {lore.length > 0 && (
-        <div className="absolute bottom-4 right-24 text-xs text-muted-foreground bg-white/80 px-2 py-1 rounded">
-          Doble clic para editar · Arrastra desde un nodo a otro para conectar
+        <div className="absolute bottom-4 right-24 text-xs text-muted-foreground bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-md">
+          Doble clic para editar · Clic en línea para editar relación · Arrastra para conectar
         </div>
       )}
+
+      {/* Edge Edit Dialog */}
+      <Dialog open={edgeEdit.isOpen} onOpenChange={(open) => setEdgeEdit(prev => ({ ...prev, isOpen: open }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Conexión</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">{sourceLoreName}</span>
+              {' → '}
+              <span className="font-medium text-foreground">{targetLoreName}</span>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="relationshipType">Tipo de Relación</Label>
+              <Select
+                value={edgeEdit.relationshipType}
+                onValueChange={(value) => setEdgeEdit(prev => ({ ...prev, relationshipType: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {RELATIONSHIP_TYPES.map(type => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Descripción (opcional)</Label>
+              <Input
+                id="description"
+                value={edgeEdit.description}
+                onChange={(e) => setEdgeEdit(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Detalles adicionales de la relación..."
+              />
+            </div>
+
+            <div className="flex justify-between pt-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteEdge}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Eliminar
+              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setEdgeEdit(prev => ({ ...prev, isOpen: false }))}
+                >
+                  Cancelar
+                </Button>
+                <Button onClick={handleSaveEdge}>
+                  Guardar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
