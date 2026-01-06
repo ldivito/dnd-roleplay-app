@@ -33,6 +33,15 @@ import type { LocationMap } from '@/types/map'
 import type { Taxonomy, TaxonomyCategory } from '@/types/taxonomy'
 import { DEFAULT_TAXONOMIES } from '@/types/taxonomy'
 import type { RestEvent } from '@/types/rest'
+import type {
+  LoreGraphLayout,
+  LoreNodePosition,
+} from '@/types/loreGraph'
+import {
+  DEFAULT_LORE_GRAPH_LAYOUT,
+  DEFAULT_VIEWPORT,
+} from '@/types/loreGraph'
+import type { Viewport } from '@xyflow/react'
 import {
   performShortRest,
   performLongRest,
@@ -69,6 +78,7 @@ interface SessionState extends PersistState {
   maps: LocationMap[]
   taxonomies: Taxonomy[]
   restEvents: RestEvent[]
+  loreGraphLayout: LoreGraphLayout
 
   // Actions
   createSession: (
@@ -114,6 +124,12 @@ interface SessionState extends PersistState {
   addEra: (era: Era) => void
   updateEra: (eraId: string, updates: Partial<Era>) => void
   removeEra: (eraId: string) => void
+
+  // Lore Graph Layout Actions
+  setLoreNodePosition: (loreId: string, position: LoreNodePosition) => void
+  setLoreNodePositions: (positions: Record<string, LoreNodePosition>) => void
+  setLoreGraphViewport: (viewport: Viewport) => void
+  resetLoreGraphLayout: () => void
 
   addNPC: (npc: NPC) => void
   updateNPC: (npcId: string, updates: Partial<NPC>) => void
@@ -242,6 +258,7 @@ export const useSessionStore = create<SessionState>()(
       maps: [],
       taxonomies: [],
       restEvents: [],
+      loreGraphLayout: DEFAULT_LORE_GRAPH_LAYOUT,
 
       createSession: sessionData => {
         const session: Session = {
@@ -558,6 +575,44 @@ export const useSessionStore = create<SessionState>()(
         set(state => ({
           eras: state.eras.filter(era => era.id !== eraId),
         }))
+      },
+
+      // Lore Graph Layout Actions
+      setLoreNodePosition: (loreId, position) => {
+        set(state => ({
+          loreGraphLayout: {
+            ...state.loreGraphLayout,
+            nodes: {
+              ...state.loreGraphLayout.nodes,
+              [loreId]: position,
+            },
+          },
+        }))
+      },
+
+      setLoreNodePositions: positions => {
+        set(state => ({
+          loreGraphLayout: {
+            ...state.loreGraphLayout,
+            nodes: {
+              ...state.loreGraphLayout.nodes,
+              ...positions,
+            },
+          },
+        }))
+      },
+
+      setLoreGraphViewport: viewport => {
+        set(state => ({
+          loreGraphLayout: {
+            ...state.loreGraphLayout,
+            viewport,
+          },
+        }))
+      },
+
+      resetLoreGraphLayout: () => {
+        set({ loreGraphLayout: DEFAULT_LORE_GRAPH_LAYOUT })
       },
 
       addNPC: npc => {

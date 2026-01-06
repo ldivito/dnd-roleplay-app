@@ -108,6 +108,7 @@ function extractSerializableData(state: any): any {
     'maps',
     'taxonomies',
     'restEvents',
+    'loreGraphLayout',
   ]
 
   for (const key of dataKeys) {

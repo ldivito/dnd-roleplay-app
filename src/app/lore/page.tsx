@@ -35,12 +35,14 @@ import {
   Filter,
   Eye,
   EyeOff,
+  Network,
 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSessionStore } from '@/stores/sessionStore'
 import LoreTimeline from '@/components/LoreTimeline'
 import LoreConnectionManager from '@/components/LoreConnectionManager'
+import LoreGraphView from '@/components/LoreGraphView'
 import type {
   Lore,
   LoreType,
@@ -547,6 +549,10 @@ export default function LorePage() {
         <TabsList>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="main-timeline">Timeline Principal</TabsTrigger>
+          <TabsTrigger value="graph">
+            <Network className="h-4 w-4 mr-1" />
+            Mapa
+          </TabsTrigger>
           <TabsTrigger value="all">Todo el Lore</TabsTrigger>
         </TabsList>
 
@@ -582,6 +588,24 @@ export default function LorePage() {
                 onAddLore={handleAddLore}
                 onDeleteLore={handleDeleteLore}
                 showOnlyMainTimeline={true}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="graph" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Network className="h-5 w-5" />
+                Mapa de Relaciones
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <LoreGraphView
+                onEditLore={handleEditLore}
+                onAddLore={() => handleAddLore()}
+                onDeleteLore={handleDeleteLore}
               />
             </CardContent>
           </Card>
