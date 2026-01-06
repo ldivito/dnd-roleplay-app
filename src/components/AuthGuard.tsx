@@ -24,7 +24,7 @@ export default function AuthGuard({
         router.push('/login')
       } else if (!requireAuth && user) {
         // User is authenticated but on a public page (login/signup)
-        router.push('/campaign')
+        router.push('/')
       }
     }
   }, [user, loading, requireAuth, router])

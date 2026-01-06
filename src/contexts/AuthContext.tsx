@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false)
 
           if (event === 'SIGNED_IN') {
-            router.push('/campaign')
+            router.push('/')
           }
         } else if (user && !user.email_confirmed_at) {
           // User exists but email not confirmed - don't set user
